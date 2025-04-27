@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+
+<head>
+  <meta charset="utf-8" />
+  <title>Title</title>
+  <script type="text/javascript">
+
+    var limit = 20
+    var tech = 0
+    var crea = 0
+    var doc = 0
+
+    function onload() {
+      var tech = localStorage.getItem("Technology")
+      var crea = localStorage.getItem("Creativity")
+      var doc = localStorage.getItem("Documentation")
+      localStorage.setItem("Technology", tech)
+      localStorage.setItem("Creativity", crea)
+      localStorage.setItem("Documentation", doc)
+    }
+
+    function update() {
+      localStorage.setItem("Technology", tech)
+      localStorage.setItem("Creativity", crea)
+      localStorage.setItem("Documentation", doc)
+    };
+
+    function Technology(i) {
+      if (i == 1 && tech != 0) {
+        tech = tech - 1
+      } else if (i == 2) {
+        if ( (tech + crea + doc) == limit ) { return; }
+        tech = tech + 1
+      };
+      document.querySelector('.tech').innerHTML = tech;
+      update();
+    };
+
+    function Creativity(i) {
+      if (i == 1 && crea != 0) {
+        crea = crea - 1
+      } else if (i == 2) {
+        if ( (tech + crea + doc) == limit ) { return; }
+        crea = crea + 1
+      };
+      document.querySelector('.crea').innerHTML = crea;
+      update();
+    };
+
+    function Documentation(i) {
+      if (i == 1 && doc != 0) {
+        doc = doc - 1
+      } else if (i == 2) {
+        if ( (tech + crea + doc) == limit ) { return; }
+        doc = doc + 1
+      };
+      document.querySelector('.Doc').innerHTML = doc;
+      update();
+    };
+
+  </script>
+</head>
+
+<body windows.onload="onload()">
+  <button type="button" onclick="Technology(1);" style="display: inline;">-</button>
+      <p style="display: inline;"> Technology (</p> <div style="display: inline;" class="tech"></div><p style="display: inline;">)</p>
+  <button type="button" onclick="Technology(2);" style="display: inline;">+</button>
+  <br>
+
+  <button type="button" onclick="Creativity(1);" style="display: inline;">-</button>
+      <p style="display: inline;"> Creativity (</p> <div style="display: inline;" class="crea"></div><p style="display: inline;">)</p>
+  <button type="button" onclick="Creativity(2);" style="display: inline;">+</button>
+  <br>
+
+  <button type="button" onclick="Documentation(1);" style="display: inline;">-</button>
+      <p style="display: inline;"> Documentation (</p> <div style="display: inline;" class="Doc"></div><p style="display: inline;">)</p>
+  <button type="button" onclick="Documentation(2);" style="display: inline;">+</button>
+  <br>
+</body>
+
+</html>

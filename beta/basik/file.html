@@ -1,0 +1,39 @@
+<canvas width='1000' height='1000' id='cnvs1'></canvas>
+<div id="images">;
+<script>
+var gCnvs = document.getElementById('cnvs1').getContext('2d')
+var frames = 0
+var pics = {}
+createImg = function(img,nframes){
+var thing = document.createElement('IMG')
+thing.src = img+'.png'
+thing.width = 0
+thing.id = img
+document.getElementById("images").appendChild(thing)
+pics[img] = {
+src:document.getElementById(img),
+frames:nframes,
+}
+}
+writeNums = function(x,y,nums){
+for(var i = 0;i<Math.floor(Math.log10(nums))+1;i++){
+
+drawSprite(pics.nums,Math.floor(nums/(Math.pow(10,i)))-1,x,y)
+x-=10
+}
+}
+drawSprite = function(thing,interval,x,y){
+var width = thing.src.naturalWidth
+var height = thing.src.naturalHeight/thing.frames
+gCnvs.drawImage(thing.src,0,(interval%thing.frames)*(height),width,height,x,y,width,height)
+}
+createImg('load',14)
+createImg('nums',10)
+update = function(){
+frames++
+gCnvs.clearRect(0,0,1000,1000)
+writeNums(100,20,frames/100)
+drawSprite(pics.nums,Math.round(frames/20),0,0)
+drawSprite(pics.load,Math.round(frames/1),20,0)}
+var updat = setInterval(update,1000/30)
+</script>

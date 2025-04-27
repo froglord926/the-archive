@@ -1,0 +1,315 @@
+<style>
+canvas {
+    cursor: none
+}</style>
+<canvas id="ctx" width="1000" height="500" style="border:1px solid #000000;"></canvas>
+<img src="Cursor.png" id="Explosion" width="0">
+<script> 
+var ctx = document.getElementById("ctx").getContext("2d"); 
+var Cursor = document.getElementById("Explosion");
+ctx.font = '30px Arial';
+var frames = 0
+var HEIGHT = 500;
+var WIDTH = 1000;
+var timeWhenGameStarted = Date.now();	//return time in ms
+
+var room = {
+ x:0,
+ y:0,
+}
+var control = false
+var res = false
+var player = {
+	x:WIDTH/2,
+	spdX:30,	
+	y:HEIGHT/2,
+	spdY:5,
+	name:'P',
+	hp:10,
+	width:10,
+	height:10,
+	color:'black',
+};
+var bulletList = {};
+var enemyList = {};
+
+getDistanceBetweenEntity = function (entity1,entity2){	//return distance (number)
+	var vx = entity1.x - entity2.x;
+	var vy = entity1.y - entity2.y;
+	return Math.sqrt(vx*vx+vy*vy);
+}
+testCollisionEntity = function (entity1,entity2){	
+	var rect1 = {
+		x:entity1.x-entity1.width/2,
+		y:entity1.y-entity1.height/2,
+		width:entity1.width,
+		height:entity1.height,
+	}
+	var rect2 = {
+		x:entity2.x-entity2.width/2,
+		y:entity2.y-entity2.height/2,
+		width:entity2.width,
+		height:entity2.height,
+	}
+	return testCollisionRectRect(rect1,rect2);
+}
+var frog = false
+var gravity = true
+var frog2 = true
+document.onmousedown = function() {if(frog2)frog = true
+									else{Engen2('#E0B300')}};
+document.onmouseup = function() {frog = false};
+Enemy = function (id,x,y,spdX,spdY,width,height,color){
+	var enemy3 = {
+		x:x,
+		spdX:spdX,
+		y:y,
+		spdY:spdY,
+		name:'E',
+		id:id,
+		width:width,
+		height:height,
+		color:color,
+		velx:0,
+		vely:0
+	};
+	enemyList[id] = enemy3;
+	
+}
+
+document.onkeydown = function (event) {
+                if (event.keyCode === 49) {                    
+	if (gravity == false) {
+                        gravity = true
+                    }
+                    else {
+                        gravity = false
+                    }}      //1
+       else if (event.keyCode === 50) {
+				if (trace == false) {
+                        trace = true
+                    }
+                    else {
+                        trace = false
+                    }				}  //2
+          else if (event.keyCode === 51) { 
+								if (collide == false) {
+                        collide = true
+                    }
+                    else {
+                        collide = false
+                    }}//3
+         else if (event.keyCode === 52) {
+				if (terminal == false) {
+                        terminal = true
+                    }
+                    else {
+                        terminal = false
+                    }				}// 4
+					else if (event.keyCode === 53) {player.width = 5; player.height = 5; succ = 0.5} //5
+					else if (event.keyCode === 54) {if(size > 1)size -= 0.5} //6
+					else if (event.keyCode === 55) {size += 0.5} //7
+					else if (event.keyCode === 87) {				if (anti == false) {
+                        anti = true
+                    }
+                    else {
+                        anti = false
+                    }	} //7
+					else if (event.keyCode === 81){				if (res == false) {
+                        res = true
+                    }
+                    else {
+                        res = false
+                    }}
+					else if (event.keyCode === 48) {				if (control == false) {
+                        control = true
+                    }
+                    else {
+                        control = false
+                    }} //0
+					else if (event.keyCode === 56) {enemyList = {}; ctx.clearRect(0,0,WIDTH,HEIGHT)} //8
+					         else if (event.keyCode === 57) { //9
+				if (frog2 == false) {
+                        frog2 = true
+                    }
+                    else {
+                        frog2 = false
+                    }	}
+                }
+mouseX = 0
+mouseY = 0
+var size = 3
+document.onmousemove = function(mouse){
+	mouseX = mouse.clientX -8;
+	mouseY = mouse.clientY -8;
+
+}
+updateEntity = function (something){
+	updateEntityPosition(something);
+	drawEntity(something);
+}
+updateEntityPosition = function(something){
+	something.x += something.velx
+	something.y += something.vely	
+	
+}
+testCollisionRectRect = function(rect1,rect2){
+	return rect1.x <= rect2.x+rect2.width 
+		&& rect2.x <= rect1.x+rect1.width
+		&& rect1.y <= rect2.y + rect2.height
+		&& rect2.y <= rect1.y + rect1.height;
+}
+drawEntity = function(something){
+	ctx.fillStyle = something.color;
+	ctx.beginPath();
+	ctx.arc(something.x, something.y, something.width/2, 0, 2 * Math.PI);
+	
+	ctx.fill();
+}
+Bullet = function (id,x,y,spdX,spdY,width,height){
+        var bult = {
+                x:x,
+                spdX:spdX,
+                y:y,
+                spdY:spdY,
+                name:'E',
+                id:id,
+                width:width,
+                height:height,
+                color:'black',
+        };
+        bulletList[id] = bult;
+}
+ 
+Bugen = function(){
+        var x = player.x;
+        var y = player.y;
+        var height = 10;
+        var width = 10;
+        var id = Math.random();
+        var angle = 0.25*360;
+        var spdX = Math.cos(angle/180*Math.PI)*0;
+        var spdY = Math.sin(angle/180*Math.PI)*0;
+}
+
+var counter = 0
+var collide = false
+var trace = false
+var succ = 0.5
+var terminal = true
+update = function(){
+	if(!trace){
+	ctx.clearRect(0,0,WIDTH,HEIGHT)}
+	frames++
+	ctx.drawImage(Cursor,mouseX-5,mouseY-5)
+	if(control){
+	player.x = mouseX; 
+	player.y = mouseY}
+
+	for(var key in bulletList){
+		updateEntity(bulletList[key]);
+		for(var f in enemyList){
+		};
+		}
+	for(var key in enemyList){
+		updateEntity(enemyList[key]);
+		var isColliding = testCollisionEntity(player, enemyList[key]);
+		for(var f in enemyList){
+		var isColliding2 = testCollisionEntity(enemyList[f], enemyList[key]);
+		if (isColliding2 && enemyList[f].color == '#727272' &&enemyList[key].color != '#727272'){
+			                 if (player.x > enemyList[key].x) {
+                                enemyList[key].velx += succ
+                            }
+                            if (player.x < enemyList[key].x) {
+                                enemyList[key].velx -= succ
+                            }
+                            if (player.y < enemyList[key].y) {
+                                enemyList[key].vely -= succ
+                            }
+                            if (player.y > enemyList[key].y) {
+                                enemyList[key].vely += succ
+                            }
+		} 
+		}
+		if(terminal){
+		if (enemyList[key].velx > enemyList[key].width*3)
+			enemyList[key].velx = enemyList[key].width*3
+		if (enemyList[key].velx < -enemyList[key].width*3)
+			enemyList[key].velx = -enemyList[key].width*3
+		if (enemyList[key].vely > enemyList[key].width*3)
+			enemyList[key].vely = enemyList[key].width*3
+		if (enemyList[key].vely < -enemyList[key].width*3)
+			enemyList[key].vely = -enemyList[key].width*3 }
+			if(res){if (enemyList[key].velx > 0) {
+			
+                                enemyList[key].velx -= 0.05
+                            }
+                            if (enemyList[key].velx < 0) {
+                                enemyList[key].velx += 0.05
+                            }
+                            if (enemyList[key].vely < 0) {
+                                enemyList[key].vely += 0.05
+                            }
+                            if (enemyList[key].vely > 0) {
+                                enemyList[key].vely -= 0.05
+                            }}
+if(gravity && enemyList[key].color == '#E0B300'){
+		                            if (player.x > enemyList[key].x) {
+                                enemyList[key].velx += succ
+                            }
+                            if (player.x < enemyList[key].x) {
+                                enemyList[key].velx -= succ
+                            }
+                            if (player.y < enemyList[key].y) {
+                                enemyList[key].vely -= succ
+                            }
+                            if (player.y > enemyList[key].y) {
+                                enemyList[key].vely += succ
+                            }}
+		if(isColliding && collide){
+		delete enemyList[key]
+		player.width += size/2
+		player.height += size/2
+		succ += 0.1
+		}
+		
+	}
+	
+
+	drawEntity(player);
+
+}
+
+Engen = function(color){
+var x = mouseX
+var y = mouseY
+var height = 20
+var width = 20
+var id = Math.random()
+var spdX = Math.random()*20
+var spdY = Math.random()*20
+var color = color
+Enemy(id,x,y,spdX,spdY,width,height,color)
+}
+Engen2 = function(color){
+var x = mouseX
+var y = mouseY
+var height = size	
+var width = size
+var id = Math.random()
+var spdX = Math.random()*20
+var spdY = Math.random()*20
+var color = color
+Enemy(id,x,y,spdX,spdY,width,height,color)
+}
+var anti = false
+gen = function(){
+
+if(frog && frog2){
+if(!anti){Engen2('#E0B300')}
+else {Engen2('#727272')}}
+}
+var fps = 30
+setInterval(update,1000/fps);
+setInterval(gen,1000/100);
+</script>

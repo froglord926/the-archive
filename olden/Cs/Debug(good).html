@@ -1,0 +1,42 @@
+<html>
+<head>
+<title>Website</title>
+</head>
+<body>
+<h1>Cool things you can do with js</h1>
+<div><h3>Editable text</h3>
+<button onclick="one()">Click to edit</button>
+<span id="edit1">This will be editied</span>
+</div>
+<div><h3>Counters</h3>
+<button onclick="two()">+1</button>
+<span id="edit2">0</span>
+</div>
+<div><h3>Simple passwords</h3>
+<button onclick="three()">Password</button>
+</div>
+<div><h3>Repition</h3>
+<button onclick="four()">Repeat</button>
+<br><span id="edit3"></span>
+</div>
+
+</body>
+<script>
+var pass = 'nothing'
+function one(){
+document.getElementById("edit1").innerHTML = prompt('What do you want the text to be?')}
+function two(){
+document.getElementById("edit2").innerHTML++}
+function three(){
+pass = prompt('Insert password')
+if (pass == 'good'){
+alert('you got it right')
+}else{alert('you got it wrong')}
+}
+function four(){
+var times = prompt('how many times')
+for(times;times>0;times--)
+document.getElementById("edit3").innerHTML+="Repititon<br>"}
+
+</script>
+</html>

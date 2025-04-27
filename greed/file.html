@@ -1,0 +1,203 @@
+<style>
+body{font-family:"Corrier New", Monospace, serif;font-size:16px;}
+.player{background-color:white;color:black;}
+.b1{color:#808000;}
+.b2{color:#800000;}
+.b3{color:#008000;}
+.b4{color:#008080;}
+.b5{color:#800080;}
+.b6{color:#FFFF00;}
+.b7{color:#FF0000;}
+.b8{color:#FF0000;}
+.b9{color:#00FFFF;}
+.x{background-color:white;color:black}
+#board{
+background-color:#300A24;
+color:white;
+position:absolute;
+
+}
+#menu{
+background-color:#300A24;
+color:#ffffff;
+position:absolute;
+width:759.14px;
+height:396px;
+z-index:2;
+}
+.score{
+position:absolute;
+bottom:0%;}
+#sliderTable{
+color:white;
+}
+</style>
+
+<div id="menu" hidden="true">
+<button onclick="start()">RESTART</button>
+<button onclick="color()">UPDATE COLOR</button>
+<br>
+1:<input type="color" id="color">
+2:<input type="color" id="color">
+3:<input type="color" id="color">
+4:<input type="color" id="color">
+5:<input type="color" id="color">
+6:<input type="color" id="color">
+7:<input type="color" id="color">
+8:<input type="color" id="color">
+9:<input type="color" id="color">
+
+</table>
+
+</div>
+
+<div id="board"></div><br>
+<div class="score">
+Current Score: <span id="score"></span><br>
+High Score: <span id="highScore"></span><br>
+Last Score: <span id="lastScore"></span></div>
+<script>
+var board = [];
+var WIDTH = 79;
+var HEIGHT = 22;
+var wiper = "&nbsp"
+var drawer = document.getElementById("board");
+var person = {x:Math.floor(Math.random()*WIDTH),y:Math.floor(Math.random()*HEIGHT)};
+var highlight = false;
+var score = 0;
+var highScore = 0;
+if(localStorage.getItem("greedHigh") != undefined)
+highScore = localStorage.getItem("greedHigh");
+document.getElementById("highScore").innerHTML = Math.round(highScore/(WIDTH*HEIGHT)*10000)/100 + "%"
+start = function(){
+document.getElementById("lastScore").innerHTML = Math.round(score/(WIDTH*HEIGHT)*10000)/100 + "%";
+if(score > highScore){
+localStorage.setItem("greedHigh",score)
+highScore = score;
+document.getElementById("highScore").innerHTML = Math.round(highScore/(WIDTH*HEIGHT)*10000)/100 + "%"
+}
+
+person = {x:Math.floor(Math.random()*WIDTH),y:Math.floor(Math.random()*HEIGHT)};
+for(var i=0;i<22;i++){
+board[i]=[];
+for(var o=0;o<79;o++){
+board[i][o] = Math.ceil(Math.random()*9)+""
+}
+}
+drawGrid(board)
+score = 0;
+document.getElementById("score").innerHTML = Math.round(score/(WIDTH*HEIGHT)*10000)/100 + "%";
+}
+drawGrid = function(board){
+board[person.y][person.x] = "@"
+drawer.innerHTML = "";
+var html = ''  
+if(highlight){
+
+}
+
+for(var i in board){
+    for(var o in board[i]){
+		if(board[i][o].substring(1,2) == "x"){
+		html+="<span class='x'>"+board[i][o].substring(0,1)+"</span>"
+		continue;
+		}
+		if(board[i][o] == '@'){
+		html+="<span class='player'>"+board[i][o]+"</span>"
+		continue;
+		}
+        html+="<span class='b"+board[i][o]+"'>"+board[i][o]+"</span>"
+    }
+    html+= '<br>'
+}
+  drawer.innerHTML = html
+}
+move = function(x,y,move = true,tempboarda = false){
+var currentp = {x:parseInt(person.x),y:parseInt(person.y)};
+
+try{
+var num = parseInt(board[person.y+y][person.x+x])
+if(isNaN(board[person.y+y][person.x+x]))
+throw "next to thingy"
+if(move == true)
+score+=num
+for(var i = 0;i < num;i++){
+if(board[currentp.y][currentp.x] == wiper || board[currentp.y][currentp.x] == undefined || currentp.x<0 || currentp.y<0 || currentp.x >=WIDTH || currentp.y >= HEIGHT)
+throw "oof move"
+
+if(move == true){
+board[currentp.y][currentp.x] = wiper;
+}else if(move == -1){
+tempboarda[currentp.y+y][currentp.x+x] +="x"
+}
+currentp.y+=y;
+currentp.x+=x;
+}
+if(board[currentp.y][currentp.x] == wiper || board[currentp.y][currentp.x] == undefined || currentp.x<0 || currentp.y<0 || currentp.x >=WIDTH || currentp.y >= HEIGHT)
+throw "oof move"
+}catch(er){
+return false
+}
+if(move == true){
+person.x = parseInt(currentp.x);
+person.y = parseInt(currentp.y);
+}
+return true;
+}
+isKey = function(kees,event){
+for(var i in kees){
+if(kees[i]==event.key || kees[i]==event.keyCode)return true;
+}
+return false
+}
+start()
+
+document.onkeydown = function(e){
+
+if(e.key == "m")
+document.getElementById("menu").hidden = !document.getElementById("menu").hidden;
+if(document.getElementById("menu").hidden){
+if(isKey(["w",104],e) && move(0,-1,false))move(0,-1,true);
+if(isKey(["a",100],e) && move(-1,0,false))move(-1,0,true);
+if(isKey(["s",98],e) && move(0,1,false))move(0,1,true);
+if(isKey(["d",102],e) && move(1,0,false))move(1,0,true);
+
+if(isKey(["q",103],e) && move(-1,-1,false))move(-1,-1,true);
+if(isKey(["e",105],e) && move(1,-1,false))move(1,-1,true);
+if(isKey(["z",97],e) && move(-1,1,false))move(-1,1,true);
+if(isKey(["c",99],e) && move(1,1,false))move(1,1,true);
+
+
+var tempboard = [];
+for(var i=0;i<board.length;i++){
+tempboard[i] = [];
+for(var o=0;o<board[i].length;o++){
+tempboard[i][o] = board[i][o]+"";
+}}
+if(e.key == "p")
+if(highlight)
+highlight = false;
+else
+highlight = true; 
+if(highlight){
+if(move(0,-1,false))move(0,-1,-1,tempboard)
+if(move(-1,0,false))move(-1,0,-1,tempboard)
+if(move(0,1,false))move(0,1,-1,tempboard)
+if(move(1,0,false))move(1,0,-1,tempboard)
+
+if(move(-1,-1,false))move(-1,-1,-1,tempboard)
+if(move(1,-1,false))move(1,-1,-1,tempboard)
+if(move(-1,1,false))move(-1,1,-1,tempboard)
+if(move(1,1,false))move(1,1,-1,tempboard)
+}
+
+drawGrid(tempboard)
+if(!(move(0,-1,false) || move(-1,0,false) || move(0,1,false) || move(1,0,false) || move(-1,-1,false) || move(1,-1,false) || move(-1,1,false) || move(1,1,false))){
+
+start();
+}
+document.getElementById("score").innerHTML = Math.round(score/(WIDTH*HEIGHT)*10000)/100 + "%"																			
+}}
+
+
+</script>

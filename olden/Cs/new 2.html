@@ -1,0 +1,84 @@
+<style>
+	button{
+	background-color: #00ee00;
+	width:30;
+	height:30
+	}
+	#submit{
+	width:60;
+	height:30
+	}
+	#buttonu{
+	background-color: #00ee00;
+	cursor: n-resize;
+	}
+	#buttond{
+	background-color: #00ee00;
+	cursor: s-resize;
+	}
+	#buttonl{
+	background-color: #00ee00;
+	cursor: w-resize;
+	}
+	#buttonr{
+	background-color: #00ee00;
+	cursor: e-resize;
+	}
+	#buttonm{
+	background-color: #00ee00;
+	cursor: not-allowed;
+	}
+	#buttons{
+	z-index: 200;
+	position: fixed;
+	top:60%;
+	right:50%
+}
+	#hover{
+	height:482;
+	width:960
+		}
+</style>
+<img src="https://cdn.pixabay.com/photo/2012/04/26/18/41/banana-42793_960_720.png" id="hover">
+<center>
+<div id="buttons"><button onclick="up()" id="buttonu">↑</button><br>
+<button onclick="left()" id="buttonl">←</button><button onclick="reset()" id="buttonm">↺</button><button onclick="right()" id="buttonr">→</button><br>
+<button onclick="down()" id="buttond">↓</button><br><br><br>
+url:<br>
+<input id="input" type="text" value="https://cdn.pixabay.com/photo/2012/04/26/18/41/banana-42793_960_720.png">
+<br><button onclick="submit()" id="submit" > Submit </button>
+</div>
+
+</center>
+<script>
+
+var wid = 960
+var heigh = 482
+up = function(){
+heigh -= 10
+document.getElementById("hover").style.height = heigh
+}
+down = function(){
+heigh += 10
+document.getElementById("hover").style.height = heigh
+}
+left = function(){
+wid -= 10
+document.getElementById("hover").style.width = wid
+}
+right = function(){
+wid += 10
+document.getElementById("hover").style.width = wid
+}
+
+document.getElementById("hover").src
+submit = function(){
+document.getElementById("hover").src = document.getElementById("input").value
+}
+reset = function(){
+wid = 960
+heigh = 482
+v
+document.getElementById("hover").style.height = heigh
+}
+</script>

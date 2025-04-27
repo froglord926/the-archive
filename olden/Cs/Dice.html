@@ -1,0 +1,33 @@
+<button onclick="roll()">Roll dice</button>
+<div id="hi"></div>
+<span id="count">0</span> Times
+<script>
+var one  //die 1
+var two  //die 2
+
+function die(num){																				//Asigning a picture to the numbers
+if(num == 1){return "<img src='http://dobbelsteen.virtuworld.net/img/1c.gif' width='50'>"}
+else if(num == 2){return "<img src='http://dobbelsteen.virtuworld.net/img/2c.gif' width='50'>"}
+else if(num == 3){return "<img src='http://dobbelsteen.virtuworld.net/img/3c.gif' width='50'>"}
+else if(num == 4){return "<img src='http://dobbelsteen.virtuworld.net/img/4c.gif' width='50'>"}
+else if(num == 5){return "<img src='http://dobbelsteen.virtuworld.net/img/5c.gif' width='50'>"}
+else if(num == 6){return "<img src='http://dobbelsteen.virtuworld.net/img/6c.gif' width='50'>"}
+
+}
+function roll(){
+if(one != 1 || two !=1){
+document.getElementById("hi").innerHTML  ="" // clearing images
+//while(one!=two || 1!=one){ //loop
+one = Math.ceil(Math.random()*6) //randomizing die 1
+two = Math.ceil(Math.random()*6) //randomizing die 2
+document.getElementById("hi").innerHTML += die(one)+die(two)+"<br>" // Writing picturrs
+document.getElementById("count").innerHTML++ // adding to the counter
+}}
+
+
+
+
+
+
+
+</script>

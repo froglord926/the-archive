@@ -1,0 +1,34 @@
+<style>#canvas{position:absolute;top:0%;left:0%}</style>
+<canvas id="canvas"></canvas>
+<script>
+var WIDTH = window.innerWidth;
+var HEIGHT = window.innerHeight;
+var canvas = document.getElementById("canvas");
+var ctx = canvas.getContext("2d");
+canvas.width = WIDTH;
+canvas.height = HEIGHT;
+var points = [
+[0,0,0],
+[0,0,1],
+[0,1,0],
+[0,1,1],
+[1,0,0],
+[1,0,1],
+[1,1,0],
+[1,1,1]]
+var rendPts = points;
+var rotXx = 0;
+rotX = function(point){
+var y =  points[point][1];
+var z = points[point][2]
+rendPts[point][1]=((y)*Math.cos(rotXx)+(z*Math.sin(rotXx)))
+rendPts[point][2]=((z)*Math.cos(rotXx)+(y*Math.sin(rotXx)))
+}
+setInterval(function(){
+for(var i in points){
+ctx.clearRect(0,0,WIDTH,HEIGHT)
+rotXx+=1
+rotX(i)
+ctx.fillRect(rendPts[i][0]*50+50,rendPts[i][1]*50+50,2,2)
+}},1000/30)
+</script>

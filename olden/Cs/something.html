@@ -1,0 +1,16 @@
+<div id="hi"></div>
+<script>
+var text = prompt("Text1")
+var text2 = prompt("Text2")
+var times = prompt("Num")
+var color1 = prompt("Color1")
+var color2 = prompt("Colo2")
+var ogTimes = times
+while(times){
+if(times > ogTimes/2){
+document.getElementById("hi").innerHTML = "<div style=\"font-size:" + times +"; color:"+ color2 + "\">"  +" " +text2 + "<br></div>"  + document.getElementById("hi").innerHTML}
+else{
+document.getElementById("hi").innerHTML = "<div style=\"font-size:" + times +"; color:" + color1 +"\">" +" " +text + "<br></div>"  + document.getElementById("hi").innerHTML}
+document.getElementById("hi").style.fontsize = times + "px"
+times--}
+</script>

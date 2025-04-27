@@ -1,0 +1,202 @@
+<style>
+#console{
+overflow-y:auto;
+width:100%;
+height:100%;
+position:absolute;
+bottom:0%;
+left:0;
+background-color:#1C281F;
+color:#00B515;
+font-family:"Courier New", Courier, monospace;
+}
+::-webkit-scrollbar {
+    width: 10px;
+}
+
+
+::-webkit-scrollbar-track {
+    background: #344C3A; 
+}
+
+
+::-webkit-scrollbar-thumb {
+    background: #000; 
+}
+
+#input{
+all:inherit;
+height:10%;
+position:relative;
+overflow-y:visible;
+}
+</style>
+<div id='console'>
+<div id='log'></div>
+<input type="text" value=">>" id='input'>
+</div>
+<script>
+/*
+-------------------
+	  FORMAT
+-------------------
+*/
+//-----------------
+var layer = 0
+var grid = [
+[0,0,0],
+[0,0,0],
+[0,0,0],
+]
+var cases = [
+[grid[0][0],grid[0][1],grid[0][2]],
+[grid[1][0],grid[1][1],grid[1][2]],
+[grid[2][0],grid[2][1],grid[2][2]],
+[grid[0][0],grid[1][0],grid[2][0]],
+[grid[0][1],grid[1][1],grid[2][1]],
+[grid[0][2],grid[1][2],grid[2][2]],
+[grid[0][0],grid[1][1],grid[2][2]],
+[grid[0][2],grid[1][1],grid[2][0]],
+
+]
+player = {
+hp:10,
+x:0,
+y:0,
+damage:1
+}
+var map = []
+var turning = false
+var turn = 1
+var enemyList = [
+{name:'nothing'},
+{name:'pig',damage:1,hp:2,behavior:'play(style.random());gameTurn();	'}
+
+
+]
+
+/*
+-------------------
+	 COMMANDS
+-------------------
+*/
+play = function(spot){
+gridSpot = [Math.floor(spot/3),spot%3]
+grid[gridSpot[0]][gridSpot[1]] = turn
+turning = false
+turn = -turn
+}
+write = function(message){
+if (document.getElementById('log').innerHTML != ''){
+document.getElementById('log').innerHTML +='<br>'}
+document.getElementById('log').innerHTML += message
+
+}
+newGame = function(){}
+//-----------------
+
+
+/*
+-------------------
+    GENERATION
+-------------------
+*/
+for (i=0;i<100;i++){
+map[i] = []
+for (o=0;o<100;o++){
+map[i][o] = {
+enemy:enemyList[1]
+
+}
+
+}
+}
+
+//-----------------
+
+
+/*
+-------------------
+    PLAY STYLES 
+-------------------
+*/
+style = {
+random:function(count=1){
+for(i=0;i<count;i++){
+var placed = false
+while(!placed){
+var place = Math.round(Math.random()*9)
+if(grid[Math.floor(place/3)][place%3] == 0){
+return place
+placed = false
+}
+}}}
+}
+
+//-----------------
+document.onkeydown = function(event){
+
+if(event.keyCode === 13){
+var command = document.getElementById('input').value.replace('>>','')
+write(command)
+document.getElementById('input').value = '>>'
+try{
+eval(command)}
+catch(error){
+write(error)
+console.log(error)
+}
+}
+
+}
+
+
+gameTurn = function(){
+if (!turning){
+drawGrid = ['','','','','']
+for (i in grid){
+for (o in grid[i]){
+      if(grid[i][o] == 1){
+		drawGrid[i*2]+='x'
+}else if(grid[i][o] == -1){
+		drawGrid[i*2]+='o'
+}else{
+		drawGrid[i*2]+=parseInt(o)+(3*i)
+}
+drawGrid[i*2]+=' '
+}
+
+}
+var winner = 0
+for(var i in cases){
+if(cases[i][0] == cases[i][1] && cases[i][1] == cases[i][2]){
+winner = cases[i][0]
+}
+}
+if(winner == 1){
+map[player.y][player.x].enemy.hp-=player.damage
+write(map[player.y][player.x].enemy.name+'has been damaged for'+player.damage)
+}else if(winner == -1){
+player.hp-=map[player.y][player.x].enemy.damage
+write('you have been damaged for'+map[player.y][player.x].enemy.damage)
+}
+for (i in drawGrid){
+write(drawGrid[i])
+}
+turning = true
+}
+}
+
+write('Welcome To Tic-Tac-Toe Console Edition, play(space) to play, easy as that')
+gameTurn()
+update = function(){
+if(map[player.y][player.x].enemy.name != 'nothing'){
+if(turn == -1)
+eval(map[player.y][player.x].enemy.behavior)
+
+
+}
+
+}
+setInterval(update,30)
+</script>

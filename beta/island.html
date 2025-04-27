@@ -1,0 +1,150 @@
+<style>
+#temp{left:0%;width:20%;height:3%; position:absolute;top:0%;}
+#button{left:0%;width:20%;height:3%; position:absolute;top:3%;}
+#fps{left:0%; position:absolute;top:6%;}
+.slider {
+    -webkit-appearance: none;
+    background: rgba(50,50,50,.2);
+    outline: none;
+}
+
+
+
+.slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 5%;
+    height: 100%;
+    background: #282828;
+    cursor: pointer;
+	opacity:1
+}
+
+.slider::-moz-range-thumb {
+    width: 5%;
+    height: 100%;
+    background: #282828;
+    cursor: pointer;
+}
+</style>
+<canvas width='1000' height='1000' id='ctx' style='position:absolute;top:0%;left:0%'> </canvas>
+<input  type="range" min="0" max="255" step ='0.5'  value='127.5' id='temp' class="slider">
+<button onclick="generate(parseInt(document.getElementById('temp').value))" id="button">Generate!</button>
+<span id='fps'>hi</span>
+<script>
+const WIDTH = window.innerHeight
+const HEIGHT= window.innerHeight
+document.getElementById('ctx').height = HEIGHT
+document.getElementById('ctx').width  = WIDTH
+var ctx = document.getElementById('ctx').getContext('2d')
+var bad = ['#ffffff','#222222','#C6FFFF']
+var land = []
+var templand = []
+var h = Math.random()*50
+var k = Math.random()*50
+var d = new Date()
+var ms = d.getTime()
+var land = {
+temp:Math.random()*255,
+}
+console.log(land.temp)
+retTemp = function(){
+for(var i =-1;i<=101;i++){
+templand[i] = []
+for(var o =0;o<=100;o++){
+templand[i][o] = '#ffffff'
+}}
+}
+good = function(thing){
+var goodness = true
+for(var i in bad){
+if(thing == bad[i]){
+goodness = false
+}}
+return goodness
+}
+function generate(temp){
+for(var i =-1;i<=WIDTH/10+1;i++){
+land[i] = []
+land[i][-1] ='#222222' 
+land[i][WIDTH/10+1] ='#222222'
+
+for(var o =0;o<=HEIGHT/10;o++){
+
+
+land[i][o] = 'temp'
+}
+
+}
+	
+for(var b = 0;b<Math.random()*4000+10;b++){
+var pcolor = [
+(-Math.pow(((temp-255)/9),2)+255)*Math.random(),
+(-Math.abs(((temp-127.5)/20)*50)+255)*Math.random(),
+(-Math.pow(((temp)/9),2)+255)*Math.random()
+
+]
+//console.log(pcolor)
+var gives = []
+var frec = Math.random()/10+.9
+var varience = Math.random()*100
+for(var i = 0;i<Math.random()*100;i++){
+gives.push('rgb('+(pcolor[0]+Math.abs(Math.random()*varience-varience/2))+','+(pcolor[1]+Math.abs(Math.random()*varience-varience/2))+','+(pcolor[2]+Math.abs(Math.random()*varience-varience/2))+')')
+//console.log(gives)
+}
+var h = Math.random()*WIDTH*.2
+var k = Math.random()*WIDTH*.2
+var midx = (Math.random()*100)-50+WIDTH/20
+var midy = (Math.random()*100)-50+HEIGHT/20
+for(i in land){
+var x = parseInt(i)
+var y = Math.round(Math.sqrt(k-(k*(Math.pow((x-midx),2)/h))))
+//console.log(y)
+for(o in land[i]){
+if((parseInt(o)-midy > y || parseInt(o)-midy  < -y || isNaN(y)) && (land[i][o] == 'temp'  || land[i][o] == '#C6FFFF')){land[i][o] = '#C6FFFF'}
+else if(land[i][o] == '#C6FFFF' || land[i][o] == 'temp'){land[i][o] = '#ffffff'
+if(Math.random() > frec && gives.length > 0){var index = Math.floor(Math.random()*gives.length);land[i][o] = gives[index]}
+}
+}}}
+generating = true
+}
+
+//land[Math.round(Math.random()*100)][Math.round(Math.random()*100)]  ='rgb(0,0,0)'
+
+//land[Math.round(Math.random()*100)][Math.round(Math.random()*100)]  ='rgb(255,255,255)'
+var endlesspread = false
+var generating = true 
+var gentime = 0
+generate(land.temp);
+update = function(){
+if(generating){
+generating = false
+templand = land
+gentime+=Math.random()*10
+var moving = 10;
+for(var i in land){
+for(var o in land[i]){
+
+     if(good(land[i][o]) && Math.random() > .5 && (land[parseInt(i)-1][o] == '#ffffff' || (endlesspread && good(land[parseInt(i)-1][o])&&Math.random()<1/gentime))){templand[parseInt(i)-1][o] = land[i][o];moving=5}
+     if(good(land[i][o]) && Math.random() > .5 && (land[parseInt(i)+1][o] == '#ffffff' || (endlesspread && good(land[parseInt(i)+1][o])&&Math.random()<1/gentime))){templand[parseInt(i)+1][o] = land[i][o];moving=5}
+     if(good(land[i][o]) && Math.random() > .5 && (land[i][parseInt(o)+1] == '#ffffff' || (endlesspread && good(land[i][parseInt(o)+1])&&Math.random()<1/gentime))){templand[i][parseInt(o)+1] = land[i][o];moving=5}
+     if(good(land[i][o]) && Math.random() > .5 && (land[i][parseInt(o)-1] == '#ffffff' || (endlesspread && good(land[i][parseInt(o)-1])&&Math.random()<1/gentime))){templand[i][parseInt(o)-1] = land[i][o];moving=5}
+if((land[i][o] == '#ffffff' || endlesspread) &&moving>0){generating = true;} if(land[i][o] == '#ffffff'){gentime = 1 ;moving = 5}moving--;	console.log(moving);
+}}
+//console.log(1/gentime)
+land = templand
+}
+for(var i in land){
+for(var o in land[i]){
+ctx.fillStyle = land[i][o]
+
+ctx.fillRect(i*10,o*10,10,10)
+
+}
+}
+var d2 = new Date()
+document.getElementById("fps").innerHTML = "fps:  "+Math.round(1/((d2.getTime()-ms)/1000)*100)/100
+ms = d2.getTime()
+}
+setInterval(update,1000/30)
+</script>

@@ -1,0 +1,56 @@
+<script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.5.3/p5.js"></script><script>
+function setup(){
+createCanvas(1000,1000);
+strokeWeight(0);
+}
+var one = {
+x:500,
+y:500,
+vx:3,
+vy:3,
+}
+var two = {
+x:700,
+y:300,
+vx:3,
+vy:3,
+}
+document.onkeydown = function (event) {
+if (event.keyCode === 68) { one.x+=one.vx}
+if (event.keyCode === 65) { one.x-=one.vx}
+if (event.keyCode === 87) { one.y-=one.vy}
+if (event.keyCode === 83) { one.y+=one.vy}
+if (event.keyCode === 39) { two.x+=two.vx}
+if (event.keyCode === 37) { two.x-=two.vx}
+if (event.keyCode === 38) { two.y-=two.vy}
+if (event.keyCode === 40) { two.y+=two.vy}
+
+
+
+
+}
+function build(thing){
+fill('#12b2ce')
+ellipse(thing.x+10,thing.y,20,20)
+fill('white')
+rect(thing.x,thing.y,20,50)
+ellipse(thing.x-10,thing.y+20,60,20)
+ellipse(thing.x+30,thing.y+20,60,20)
+ellipse(thing.x+30,thing.y+20,60,20)
+ellipse(thing.x+10,thing.y+50,50,10)
+if(thing.x >=1000 || thing.x <=0 || thing.y >=1000 || thing.y <=0){thing.x = 500; thing.y = 500}
+}
+function draw() {
+clear()
+background('#6ae6fc')
+fill('white')
+build(one)
+build(two)
+
+
+
+}
+
+
+
+</script>

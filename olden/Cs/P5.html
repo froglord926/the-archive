@@ -1,0 +1,63 @@
+<!--Sawyer
+Assignment:p5  -->
+<!DOCTYPE html>
+<html>
+<head>
+<title>Webpage with P5 library</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.5.3/p5.js"></script>
+</head>
+<body>
+<script>
+var spgeti = [Math.random()*30+130,Math.random()*30+130,Math.random()*30+130,Math.random()*30+130,Math.random()*30+130,Math.random()*30+130,Math.random()*30+130]
+var spgeti2 = [Math.random()*30+260,Math.random()*30+260,Math.random()*30+260,Math.random()*30+260,Math.random()*30+260,Math.random()*30+260,Math.random()*30+260]
+var spgetarc = [Math.random()*60-120,Math.random()*60-120,Math.random()*60-120,Math.random()*60-120,Math.random()*60-120,Math.random()*60-120,Math.random()*60-120,]
+var spgetarc2 = [Math.random()*60-120,Math.random()*60-120,Math.random()*60-120,Math.random()*60-120,Math.random()*60-120,Math.random()*60-120,Math.random()*60-120,]
+function setup(){
+createCanvas(500,500);
+//strokeWeight(0);
+}
+function draw() {
+strokeWeight(1);
+background(186, 145, 20); // wooden table
+fill('#ffffff')
+ellipse(200, 200, 350, 350); // plate
+ellipse(200, 200, 300, 300);
+ellipse(400, 100, 60, 60);
+fill('#0000ff')
+ellipse(400, 100, 50, 50);
+fill('#fcf94e')
+triangle(100, 100, 200, 100, 150, 200);
+strokeWeight(10);
+stroke('#b5a92b');
+line(100, 100, 200, 100);
+stroke('#c45050');
+ellipse(130, 130, 10, 10);
+ellipse(150, 160, 10, 10);
+ellipse(170, 115, 10, 10);
+strokeWeight(0);
+fill('#e0cd57')
+rect(250, 120, 30, 150);
+strokeWeight(1);
+stroke('#a89b4b');
+line(255, 125, 255, 265);
+line(260, 125, 260, 265);
+line(265, 125, 265, 265);
+line(270, 125, 270, 265);
+line(275, 125, 275, 265);
+line(250, 120, 279, 120);
+line(250, 270, 279, 270);
+noFill();
+strokeWeight(1);
+arc(spgeti[0], spgeti2[0], spgetarc2[0], spgetarc[0], Math.pi/100, PI);
+arc(spgeti[1], spgeti2[1], spgetarc2[1], spgetarc[2], HALF_PI, PI);
+arc(spgeti[2], spgeti2[2], spgetarc2[2], spgetarc[3], HALF_PI, PI);
+arc(spgeti[3], spgeti2[3], spgetarc2[3], spgetarc[4], HALF_PI, PI);
+arc(spgeti[4], spgeti2[4], spgetarc2[4], spgetarc[5], HALF_PI, PI);
+arc(spgeti[5], spgeti2[5], spgetarc2[5], spgetarc[6], HALF_PI, PI);
+arc(spgeti[6], spgeti2[6], spgetarc2[6], spgetarc[1], HALF_PI, PI);
+strokeWeight(1);
+stroke('black');
+}
+</script>
+</body>
+</html>

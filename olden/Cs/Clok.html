@@ -1,0 +1,49 @@
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.5.3/p5.js"></script>
+</head>
+<body>
+<script>
+var x = 0
+var time = 0
+function setup(){
+createCanvas(1000,1000);
+keyCode = 0
+x = (TWO_PI/12)*9
+}
+function draw() {
+clear()
+ellipse(500, 500, 500, 500);
+
+text("3", 200*Math.cos((0))+500,200*Math.sin(0)+500);
+text("4", 200*Math.cos((TWO_PI/12))+500,200*Math.sin((TWO_PI/12))+500);
+text("5", 200*Math.cos((TWO_PI/12)*2)+500,200*Math.sin((TWO_PI/12)*2)+500);
+text("6", 200*Math.cos((TWO_PI/12)*3)+500,200*Math.sin((TWO_PI/12)*3)+500);
+text("7", 200*Math.cos((TWO_PI/12)*4)+500,200*Math.sin((TWO_PI/12)*4)+500);
+text("8", 200*Math.cos((TWO_PI/12)*5)+500,200*Math.sin((TWO_PI/12)*5)+500);
+text("9", 200*Math.cos((TWO_PI/12)*6)+500,200*Math.sin((TWO_PI/12)*6)+500);
+text("10", 200*Math.cos((TWO_PI/12)*7)+500,200*Math.sin((TWO_PI/12)*7)+500);
+text("11", 200*Math.cos((TWO_PI/12)*8)+500,200*Math.sin((TWO_PI/12)*8)+500);
+text("12", 200*Math.cos((TWO_PI/12)*9)+500,200*Math.sin((TWO_PI/12)*9)+500);
+text("1", 200*Math.cos((TWO_PI/12)*10)+500,200*Math.sin((TWO_PI/12)*10)+500);
+text("2", 200*Math.cos((TWO_PI/12)*11)+500,200*Math.sin((TWO_PI/12)*11)+500);
+
+line(250*Math.cos(x)+500,250*Math.sin(x)+500, 500, 500);
+if(keyIsPressed){
+time = 30*60
+keyIsPressed = false
+
+
+}
+if(mouseIsPressed){
+time = 60*60
+mouseIsPressed = false
+
+
+}
+
+if(time){
+x+=(TWO_PI)/(60*60)
+console.log(x*TWO_PI)
+time--
+}}
+</script>

@@ -1,0 +1,153 @@
+<style>
+#ctx{
+	position:absolute;
+	top:0%;
+	left:0%;
+
+	
+	cursor:none;
+		}
+</style>
+<canvas id="ctx" width="1000" height="1000"></canvas>
+<script>
+var width = window.innerWidth
+var height = window.innerHeight
+var x=0
+var y=0
+var shoot = false
+var frames = 0
+var work = true
+var score = 0
+var ctx= document.getElementById('ctx').getContext('2d')
+ctx.font="300px"
+document.getElementById('ctx').width = width
+document.getElementById('ctx').height = height
+var mouse={
+	x:0,
+	y:0,
+	}
+	document.onmousedown = function(){
+	shoot = true
+	}
+	function lightning(thing){
+	
+	x=thing.x
+	y=thing.y
+	
+	//console.log(2)
+	while(x<=width){
+	ctx.beginPath();
+	ctx.moveTo(x,y);
+	x += Math.random()* 300
+	y = (Math.random()*50)+(thing.y-25)
+	ctx.lineTo(x,y);
+	ctx.stroke();}
+	while(x>=0){
+	ctx.beginPath();
+	ctx.moveTo(x,y);
+	x -= Math.random()* 300
+	y = (Math.random()*50)+(thing.y-25)
+	ctx.lineTo(x,y);
+	ctx.stroke();}
+	y = thing.x
+	x = thing.y
+	while(x>=0){
+	ctx.beginPath();
+	ctx.moveTo(y,x);
+	x -= Math.random()* 300
+	y = (Math.random()*50)+(thing.x-25)
+	ctx.lineTo(y,x);
+	ctx.stroke();
+	}	while(x<=height){
+	ctx.beginPath();
+	ctx.moveTo(y,x);
+	x += Math.random()* 300
+	y = (Math.random()*50)+(thing.x-25)
+	ctx.lineTo(y,x);
+	ctx.stroke();
+	}			
+	}
+ document.onmousemove = function (event) {
+                mouse.x = (event.clientX / window.innerWidth)*width 
+                mouse.y = (event.clientY / window.innerHeight)*height
+                if(mouse.x<=0){
+					mouse.x=0
+					}
+                if(mouse.y<=0){
+					mouse.y=0
+					}
+                if(mouse.x>=width){
+					mouse.x=width
+					}
+                if(mouse.y>=height){
+					mouse.y=height
+					}
+             
+
+	}
+	enemys ={} 
+	newEnemy = function(){
+		enemys[Math.random()]={
+			x:Math.random()*width,
+			y:Math.random()*height,
+			width:20,
+			height:20,
+			velx:0,
+			vely:0,
+			spd:Math.random()*10
+			}
+		
+		}
+function update(){
+width = window.innerWidth
+height = window.innerHeight
+document.getElementById('ctx').width = width
+document.getElementById('ctx').height = height
+	frames++
+	ctx.clearRect(0,0,width,height)
+	if(work){
+	//ctx.fillStyle= "hsla("+Math.random()*360+","+Math.random()*100+"%,50%,"+Math.random()+")"
+	//ctx.fillRect(Math.random()*height-25,Math.random()*width-25,Math.random()*50,Math.random()*50)
+					ctx.fillRect(mouse.x-10,mouse.y-10,20,20)	
+						lightning(mouse)//xddddddddddddddddddddddddddddddd
+	//ctx.clearRect(Math.random()*height-25,Math.random()*width-25,Math.random()*50,Math.random()*50)
+	for(var hi in enemys){
+		if(enemys[hi].velx == 0 &&(enemys[hi].y+5<mouse.y+5 && enemys[hi].y+5>mouse.y-5)){work = false}
+		ctx.fillRect(enemys[hi].x,enemys[hi].y,enemys[hi].width,enemys[hi].height)
+							if(!(Math.floor(enemys[hi].x) >= Math.floor(mouse.x-5) && Math.floor(enemys[hi].x) <= Math.floor(mouse.x+5))){
+								enemys[hi].vely = 0
+								if (enemys[hi].x > mouse.x) {
+                                enemys[hi].velx = -enemys[hi].spd
+                            }
+                             if (enemys[hi].x < mouse.x ) {
+                                enemys[hi].velx = enemys[hi].spd
+                            }}else{
+								enemys[hi].velx = 0
+                            if (enemys[hi].y < mouse.y ) {
+                                enemys[hi].vely= enemys[hi].spd
+                            }
+                            if (enemys[hi].y > mouse.y ) {
+                                enemys[hi].vely = -enemys[hi].spd
+                            }}
+lightning(enemys[hi])
+                     
+
+	 enemys[hi].x+=enemys[hi].velx
+	 enemys[hi].y+=enemys[hi].vely
+	if (shoot){
+	if(frames % 5 == 0){
+	shoot = false;}
+	ctx.fillRect(0,mouse.y-5,width,10)
+	if(enemys[hi].y+5<mouse.y+5 && enemys[hi].y+5>mouse.y-5){
+	score++
+	delete enemys[hi]
+	}}
+}
+	
+	}else {ctx.fillText('sfds',width/2,height/2)}
+	
+	}
+	newEnemy()
+	setInterval(update,10)
+	setInterval(newEnemy,10000)
+</script>

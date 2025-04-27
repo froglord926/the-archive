@@ -1,0 +1,95 @@
+<canvas id='test' width='1000' height='1000'></canvas>
+<script>
+var ctx = document.getElementById('test').getContext('2d')
+var WIDTH = 1000;
+var cube =[
+{
+mesh:[
+[0,0,0],
+[100,0,0],
+[0,100,0],
+[100,100,0],
+[100,0,0],],
+color:'#00ff00'
+},
+{
+mesh:[
+[0,0,100],
+[100,0,100],
+[0,100,100],
+[100,100,100],
+[100,0,100],],
+color:'#00ef00'
+},
+{
+mesh:[
+[0,0,0],
+[0,100,0],
+[0,0,100],
+[0,100,100],
+[0,100,0],],
+color:'#00df00'
+},
+{
+mesh:[
+[100,0,0],
+[100,100,0],
+[100,0,100],
+[100,100,100],
+[100,100,0],],
+color:'#00cf00'
+},
+{
+mesh:[
+[0,0,0],
+[100,0,0],
+[0,0,100],
+[100,0,100],
+[100,0,0],],
+color:'#00bf00'
+},
+{
+mesh:[
+[0,100,0],
+[100,100,0],
+[0,100,100],
+[100,100,100],
+[100,100,0],],
+color:'#00af00'
+}
+]
+var rot=0
+var rot2=0
+to2d = function(x,z,center = [0,0,0]) {
+x-=center[0]
+z-=center[2]
+return ((x)*Math.cos(rot)+(z*Math.sin(rot)))+center[0]+(WIDTH/2-center[0])
+}
+zSort = 
+update = function(){
+
+
+ctx.clearRect(0,0,1000,1000)
+for(var i = cube.length-1;i>=0;i--){
+ctx.beginPath()
+ctx.fillStyle = cube[i].color
+for(var o in cube[i].mesh){
+for(var p in cube[i].mesh){
+var x=to2d(cube[i].mesh[0],cube[i].mesh[2])
+var y=cube[i].mesh[1]
+var x2=to2d(cube[i].mesh[p][0],cube[i].mesh[p][2]) 
+var y2=cube[i].mesh[p][1]
+ctx.lineTo(x,y)
+ctx.lineTo(x2,y2)
+ctx.stroke()
+ctx.fill()
+
+}
+}}
+
+
+rot+=.01
+//rot+=.01
+}
+setInterval(update,10)
+</script>

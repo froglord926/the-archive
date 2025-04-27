@@ -1,0 +1,14 @@
+<canvas id="c" width="80"></canvas>
+<script>
+var stuff = prompt("inset bin number here")
+while(stuff.indexOf(" ")!=-1)
+stuff=stuff.replace(" ", ""	)
+document.getElementById("c").height=stuff.length/8*10
+var c = document.getElementById("c").getContext("2d")
+for(var i=0;i<stuff.length;i++){
+if(stuff.charAt(i)=='1')
+c.fillRect((i%8)*10,Math.floor(i/8)*10,10,10)
+}
+
+
+</script>

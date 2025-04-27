@@ -1,0 +1,55 @@
+<canvas id='test' width='1000' height='1000'></canvas>
+<script>
+var ctx = document.getElementById('test').getContext('2d')
+var ground = [
+
+{
+line:function(x){if(x>20 && x <=50){ return x+10}},
+collide:function(x,y){if(y>this.line(x) && y<this.line(x)+2){return true}}},
+
+{line:function(x){if(x>0 && x <=20){ return 30}},
+collide:function(x,y){if(y>this.line(x) && y<this.line(x)+2){return true}},
+},
+{line:function(x){if(x>50 && x <=500){ return Math.sin(x+y)*2+59-Math.PI/3}},
+collide:function(x,y){if(y>this.line(x) && y<this.line(x)+2){return true}},
+},
+]
+var thing = {x:25,y:0,yvel:0,xvel:0,grounded :false,}
+
+update = function(){
+ctx.clearRect(0,0,1000,1000)
+
+
+
+
+thing.y+=thing.yvel
+thing.x+=thing.xvel
+var isgrav = true
+var collided = false
+for(var i in ground){
+if(ground[i].collide(thing.x,thing.y)){
+thing.yvel = 0
+if(!ground.rail){
+collided = true}else{isgrave=false}
+thing.y = ground[i].line(thing.x)+.1
+}
+if(collided){thing.grounded = true}else{thing.grounded = false}
+ctx.beginPath()
+for(var r = 0;r<1000;r++){
+ctx.lineTo(r,ground[i].line(r))
+}
+ctx.stroke()
+}
+
+if(!thing.grounded && thing.yvel<1.5 && isgrav){thing.yvel+=.1}
+
+ctx.fillRect(thing.x-10,thing.y-10,10,10)
+}
+document.onkeydown = function(event){
+if(event.key == 'w'&& thing.grounded){thing.yvel = -3;}
+if(event.key == 'a' ){thing.xvel += -1;}
+if(event.key == 'd' ){thing.xvel += 1;}
+}
+
+setInterval(update,30)
+</script>

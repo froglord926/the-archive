@@ -1,0 +1,465 @@
+<style>
+    * {
+        font: 1vw Courier;
+    }
+
+    #speed {
+        left: 0%;
+        width: 20%;
+        height: 3%;
+        position: absolute;
+        top: 0%;
+    }
+
+    #zoom {
+        left: 0%;
+        width: 20%;
+        height: 3%;
+        position: absolute;
+        top: 6%;
+    }
+
+    #spin {
+        left: 0%;
+        width: 20%;
+        height: 3%;
+        position: absolute;
+        top: 3%;
+    }
+
+    #cordx {
+        right: 2%;
+        width: 17%;
+        height: 3%;
+        position: absolute;
+        top: 0%;
+    }
+
+    #cordy {
+        right: -7.4%;
+        width: 17%;
+        height: 3%;
+        position: absolute;
+        top: 20%;
+        transform: rotate(-90deg);
+    }
+
+    #cordz {
+        right: 0%;
+        width: 17%;
+        height: 3%;
+        position: absolute;
+        top: 16%;
+        transform: rotate(-45deg);
+    }
+
+    #infohold {
+        position: absolute;
+        color: #03BBC1;
+        font-size: 0vw;
+        background: rgba(200, 230, 230, .2);
+        outline: none;
+        width: 10%;
+        height: 10%;
+        left: 0%;
+        bottom: 0%;
+        transition-duration: 2s;
+        image-rendering: pixelated;
+
+    }
+
+    #infohold:hover {
+        font-size: 1vw;
+        width: 30%;
+        height: 30%;
+    }
+
+    #cordspace {
+        right: 2%;
+        width: 17%;
+        height: 3%;
+        position: absolute;
+        top: 40%;
+        font-size: 1vw;
+        color: #03BBC1;
+    }
+
+    #warp {
+        position: absolute;
+        bottom: 0%;
+        background: #03BBC1;
+        color: rgb(50, 50, 50);
+        border: none;
+        z-index: 100;
+
+    }
+
+    .slider {
+        -webkit-appearance: none;
+        background: rgba(200, 230, 230, .2);
+        outline: none;
+    }
+
+
+
+    .slider::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 5%;
+        height: 100%;
+        background: #03BBC1;
+        cursor: pointer;
+        opacity: 1
+    }
+
+    .slider::-moz-range-thumb {
+        width: 5%;
+        height: 100%;
+        background: #03BBC1;
+        cursor: pointer;
+    }
+</style>
+<canvas width='1000' height='1000' id='cnvs'
+    style='width:100%;height:100%;bottom:0%;left:0%;position:absolute;image-rendering: pixelated;z-index:-100 '>hi</canvas>
+<input type="range" min="0" max="0.1" step='0.00001' class='slider' id='speed' value='00'>
+<input type="range" min="0" max="0.1" step='0.00001' class='slider' id='spin' value='00'>
+<input type="range" min="0.5" max="2" step='0.1' class='slider' id='zoom' value='1'>
+<input type="range" min="0" max="2" step='0.1' class='slider' id='cordx' value='1'>
+<input type="range" min="0" max="2" step='0.1' class='slider' id='cordy' value='1'>
+<input type="range" min="0" max="2" step='0.1' class='slider' id='cordz' value='1'>
+<div id="infohold"><button id="warp" onclick="js:warp()">Warp!</button>Name:<span id="selectedName"></span><canvas
+        id="info"
+        style="width:100%;height:100%;bottom:0%;left:0%;position:absolute;image-rendering: pixelated;">hi</canvas></div>
+<div id="cordspace">Coordinates:<span id="cords"></span></div>
+<script>
+    var names = ["alpha", "beta", "gamma", "delta", "epsilon", "zeta", "eta", "theta", "iota", "kappa", "lambda", "omicron", "sigma", "omega", "potato", "ostrich", "oofsilon"]
+    ctx = document.getElementById('cnvs').getContext('2d')
+
+    var selectedStar;
+    var rot = 0
+    var frames = 0
+    var WIDTH = window.innerWidth;
+    var HEIGHT = window.innerHeight;
+    var colors = ['rgb(255,255,255)', 'rgb(255,100,100)', 'rgb(0,255,255)']
+    var pColors = ['rgb(215,170,125)', 'rgb(250,155,90)', 'rgb(221,215,120)']
+
+
+    var CONFIG = {
+        zscale: WIDTH,
+        connectSpace: 200,
+        connectDev: 200,
+        connectCrd: 100,
+    }
+
+    document.getElementById("spin").max = 2 * Math.PI
+    document.getElementById('cnvs').width = WIDTH
+    document.getElementById('cnvs').height = HEIGHT
+    document.getElementById('info').width = WIDTH * .3
+    document.getElementById('info').height = HEIGHT * .3
+    document.getElementById('cordx').max = 1000
+    document.getElementById('cordx').value = 500
+    document.getElementById('cordy').max = 1000
+    document.getElementById('cordy').value = 500
+    document.getElementById('cordz').max = 1000
+    document.getElementById('cordz').value = 500
+    var seed = 30
+    function random() {
+        var x = Math.sin(seed) * 100000;
+        seed = x
+        return x - Math.floor(x);
+
+    }
+    var colonizedStars = []
+    var lastChar = 0
+    var Cstring = localStorage.getItem("star_Cstars")
+    if (Cstring != null || undefined)
+        for (var i = 0; i < Cstring.length; i++) {
+
+            if (Cstring.charAt(i) == ',') {
+                colonizedStars.push(parseInt(Cstring.substring(lastChar, i)))
+                lastChar = i + 1
+            }
+        }
+    var center = [500, 500, 500]
+    stars = []
+    for (i = 0; i < random() * 300 + 100; i++) {
+        var o = random() * Math.PI * 2;
+        var p = random() * 500;
+        var a = random() * 500;
+        stars[i] = {
+            x: Math.cos(o) * a + 500,
+            z: Math.sin(o) * a + 500,
+            y: p - 250,
+            type: colors[Math.round(Math.sqrt(random() * Math.pow(colors.length, 2))) - 1],
+            name: names[Math.floor(random() * names.length)] + "-" + names[Math.floor(random() * names.length)] + "-" + names[Math.floor(random() * names.length)],
+            connections: [],
+            planets: [],
+        }
+        for (var o = 0; o < random() * 10; o++) {
+            stars[i].planets[o] = { rotP: random() * (2 * Math.PI), distance: random(), type: pColors[Math.round(Math.sqrt(random() * Math.pow(colors.length, 2))) - 1] }
+            stars[i].planets[o].rotSpeed = (1 - stars[i].planets[o].distance) / (random() * 3 + 20)
+        }
+
+        for (o in stars) {
+            var a = (stars[i].x - stars[o].x)
+            var b = (stars[i].y - stars[o].y)
+            var c = (stars[i].z - stars[o].z)
+            var d = Math.sqrt(a * a + b * b + c * c)
+            if (d < (CONFIG.connectSpace + (2*(random() - .5) * CONFIG.connectDev)) - CONFIG.connectCrd * stars[i].connections.length) {
+                var repeated = false
+                for (a in stars[i].connections) {
+                    if (stars[i].connections[a] == o) { repeated = true }
+                }
+                if (!repeated) {
+                    stars[i].connections.push(o)
+                }
+            }
+
+
+
+
+        }
+
+    }
+    var currentShip = 0
+    warp = function () {
+        var a = Math.round(ships[currentShip].x) - Math.round(stars[ships[currentShip].at].x)
+        var b = Math.round(ships[currentShip].y) - Math.round(stars[ships[currentShip].at].y)
+        var c = Math.round(ships[currentShip].z) - Math.round(stars[ships[currentShip].at].z)
+        var h = Math.sqrt(a * a + b * b + c * c)
+        if (ships[currentShip].fuel >= h / CONFIG.connectSpace * 3) {
+            console.log(h / CONFIG.connectSpace)
+            ships[currentShip].at = selectedStar
+            ships[currentShip].warp = true
+            ships[currentShip].fuel -= h / CONFIG.connectSpace * 3
+        }
+
+    }
+    var ships = []
+    if (parseInt(localStorage.getItem("star_shipcount")) > 1) {
+        for (var i = 0; i < parseInt(localStorage.getItem("star_shipcount")); i++) {
+            ships[i] = {}
+            ships[i].at = parseInt(localStorage.getItem("star_ship" + i + "at"))
+            ships[i].x = parseFloat(localStorage.getItem("star_ship" + i + "x"))
+            ships[i].y = parseFloat(localStorage.getItem("star_ship" + i + "y"))
+            ships[i].z = parseFloat(localStorage.getItem("star_ship" + i + "z"))
+            ships[i].speed = parseFloat(localStorage.getItem("star_ship" + i + "speed"))
+            ships[i].fuel = parseFloat(localStorage.getItem("star_ship" + i + "fuel"))
+            ships[i].facing = [0, 0, 0]
+            ships[i].warp = localStorage.getItem("star_ship" + i + "warp")
+        }
+    }
+    else {
+        for (var i = 0; i < 2; i++) {
+            ships[i] = {
+                at: Math.floor(random() * stars.length),
+                x: 0,
+                y: 0,
+                z: 0,
+                speed: 0.1,
+                warp: false,
+                fuel: 10,
+                facing: [0, 0, 0],
+            }
+            ships[i].x = stars[ships[i].at].x
+            ships[i].y = stars[ships[i].at].y
+            ships[i].z = stars[ships[i].at].z
+        }
+    }
+    var starLoop = setInterval(function () { }, 20)
+    var cnvs = document.getElementById("info").getContext("2d")
+    focusStar = function (id) {
+        clearInterval(starLoop)
+        selectedStar = id;
+        document.getElementById("selectedName").innerHTML = stars[id].name
+        document.getElementById('cordx').value = stars[id].x
+        document.getElementById('cordy').value = HEIGHT / 2 - stars[id].y
+        document.getElementById('cordz').value = stars[id].z
+
+
+        starLoop = setInterval(function () {
+            cnvs.clearRect(0, 0, WIDTH * .3, WIDTH * .3)
+            for (var i in stars[selectedStar].planets) {
+                cnvs.strokeStyle = "rgb(100,100,255)"
+                cnvs.beginPath()
+
+                cnvs.arc(WIDTH * .15, HEIGHT * .15, stars[selectedStar].planets[i].distance * HEIGHT * .15, 0, 2 * Math.PI);
+                cnvs.stroke()
+
+                cnvs.fillStyle = stars[selectedStar].planets[i].type
+                cnvs.beginPath()
+                cnvs.arc(stars[selectedStar].planets[i].distance * HEIGHT * .15 * Math.sin(stars[selectedStar].planets[i].rotP) + WIDTH * .15, stars[selectedStar].planets[i].distance * HEIGHT * .15 * Math.cos(stars[selectedStar].planets[i].rotP) + HEIGHT * .15, 2, 0, 2 * Math.PI);
+                stars[selectedStar].planets[i].rotP += stars[selectedStar].planets[i].rotSpeed
+                cnvs.fill()
+
+            }
+
+            cnvs.beginPath()
+            cnvs.fillStyle = stars[selectedStar].type
+            console.log(stars[selectedStar].type)
+            cnvs.arc(WIDTH * .15, HEIGHT * .15, 10, 0, 2 * Math.PI);
+            cnvs.fill()
+        }, 20)
+
+    }
+
+
+    to2d = function (x, z) {
+        x -= center[0]
+        z -= center[2]
+        return ((x) * Math.cos(rot) + (z * Math.sin(rot))) * parseFloat(document.getElementById('zoom').value) + center[0] + (WIDTH / 2 - center[0])
+    }
+    update = function () {
+        var newstars = []
+        for (var i in stars) {
+            for (var o in newstars) {
+
+            }
+        }
+        ctx.fillStyle = 'rgb(50,50,50)'
+        ctx.fillRect(0, 0, WIDTH, HEIGHT)
+        ctx.strokeStyle = 'rgb(100,100,255)'
+        document.getElementById('spin').value = parseFloat(document.getElementById('spin').value) + parseFloat(document.getElementById('speed').value)
+        if (document.getElementById('spin').value > Math.PI * 2 - 0.01) { document.getElementById('spin').value = 0 }
+        rot = document.getElementById('spin').value
+        for (var i in stars) {
+            for (var o in stars[i].connections) {
+                ctx.beginPath()
+                ctx.moveTo(to2d(stars[i].x, stars[i].z), (stars[i].y) * parseFloat(document.getElementById('zoom').value) + center[1])
+                ctx.lineTo(to2d(stars[stars[i].connections[o]].x, stars[stars[i].connections[o]].z), (stars[stars[i].connections[o]].y) * parseFloat(document.getElementById('zoom').value) + center[1])
+
+                ctx.stroke()
+                ctx.closePath()
+            }
+
+            ctx.lineWidth = '10px'
+
+            ctx.closePath()
+            ctx.fillStyle = "#ffffff"
+
+        }
+        for (var i in ships) {
+
+
+
+            //ctx.fillRect(to2d(ships[i].x,ships[i].z)-5,y,10,10)
+            for (var o in colonizedStars) {
+                if (ships[i].at == parseInt(colonizedStars[o]) && !ships[i].warp && ships[i].fuel < 10)
+                    ships[i].fuel += 0.001
+            }
+            var w = 20
+            var q = 3
+            var j = 5
+
+            var a = 10
+            var b = 0
+            var c = 0
+            var h = Math.sqrt(a * a + b * b + c * c)
+            if (ships[i].warp) {
+                a = Math.round(ships[i].x) - Math.round(stars[ships[i].at].x)
+                b = Math.round(ships[i].y) - Math.round(stars[ships[i].at].y)
+                c = Math.round(ships[i].z) - Math.round(stars[ships[i].at].z)
+                h = Math.sqrt(a * a + b * b + c * c)
+
+
+                if (h < CONFIG.connectSpace && Math.round(ships[i].x) != Math.round(stars[ships[i].at].x) && Math.round(ships[i].y) != Math.round(stars[ships[i].at].y) && Math.round(ships[i].z) != Math.round(stars[ships[i].at].z)) {
+
+                    ships[i].x += -a / h * ships[i].speed
+                    ships[i].y += -b / h * ships[i].speed
+                    ships[i].z += -c / h * ships[i].speed
+                } else { ships[i].warp = false }
+            }
+            var x = ships[i].x
+            var y = ships[i].y * parseFloat(document.getElementById('zoom').value) + center[1] - 5
+            var z = ships[i].z
+            ctx.beginPath()
+            ctx.strokeStyle = "#ffffff"
+            ctx.lineTo(to2d(x, z), y)
+            x += (a / h) * 10
+            y += (b / h) * 10
+            z += (c / h) * 10
+
+            ctx.lineTo(to2d(x, z), y)
+            x = ships[i].x
+            y = ships[i].y * parseFloat(document.getElementById('zoom').value) + center[1] - 5
+            z = ships[i].z
+            ctx.moveTo(to2d(x, z), y)
+            x += (a / h) * 10
+            y += (b / h) * 10
+
+
+            x = ships[i].x
+            y = ships[i].y * parseFloat(document.getElementById('zoom').value) + center[1] - 5
+            z = ships[i].z
+            ctx.moveTo(to2d(x, z), y)
+            x -= (b / h) * 10
+            y += (a / h) * 10
+
+            ctx.lineTo(to2d(x, z), y)
+            ctx.stroke()
+        }
+
+
+        for (var i in stars) {
+            for (var o in colonizedStars) {
+                if (colonizedStars[o] == parseInt(i)) {
+                    ctx.beginPath()
+                    ctx.arc(to2d(stars[i].x, stars[i].z), stars[i].y * parseFloat(document.getElementById('zoom').value) + center[1], 4, 0, 2 * Math.PI);
+                    ctx.strokeStyle = "#03BBC1"
+                    ctx.stroke()
+
+                }
+            }
+            ctx.beginPath()
+            ctx.arc(to2d(stars[i].x, stars[i].z), stars[i].y * parseFloat(document.getElementById('zoom').value) + center[1], 2, 0, 2 * Math.PI);
+            ctx.fillStyle = stars[i].type
+            ctx.fill()
+
+        }
+        center[0] = parseFloat(document.getElementById('cordx').value)
+        center[1] = parseFloat(document.getElementById('cordy').value)
+        center[2] = parseFloat(document.getElementById('cordz').value)
+        document.getElementById("cords").innerHTML = parseInt(document.getElementById('cordx').value) + "-" + parseInt(document.getElementById('cordy').value) + "-" + parseInt(document.getElementById('cordz').value)
+        ctx.fillStyle = "rgba(200,230,230,.2)"
+        ctx.fillRect(WIDTH - HEIGHT * .035, HEIGHT - HEIGHT / 5, HEIGHT * .03, HEIGHT / 5)
+        ctx.fillStyle = "#03BBC1"
+        ctx.fillRect(WIDTH - HEIGHT * .035, HEIGHT - HEIGHT / 5 + (10 - ships[currentShip].fuel) * (HEIGHT / 55), HEIGHT * .03, HEIGHT / 50)
+    }
+    document.onmousedown = function (event) {
+        //console.log(to2d(stars[3].x,stars[3].z))
+        //console.log(event.x)
+        for (var i in stars) {
+
+            var h1 = Math.sqrt(Math.pow((event.x - to2d(stars[i].x, stars[i].z)), 2) + Math.pow(event.y - (stars[i].y * parseFloat(document.getElementById('zoom').value) + center[1]), 2))
+            //console.log(h1)
+            if (h1 < 5) {
+                focusStar(i)
+            }
+        }
+        for (var i in ships) {
+
+            var h1 = Math.sqrt(Math.pow((event.x - to2d(ships[i].x, ships[i].z)), 2) + Math.pow(event.y - (ships[i].y * parseFloat(document.getElementById('zoom').value) + center[1]), 2))
+            //console.log(h1)
+            if (h1 < 5) {
+                currentShip = i
+            }
+        }
+
+    }
+    /*
+    window.onunload = function(){
+    localStorage.setItem("star_shipcount",ships.length)
+    for(var i in ships){
+    localStorage.setItem("star_ship"+i+"at",ships[i].at)
+    localStorage.setItem("star_ship"+i+"x",ships[i].x)
+    localStorage.setItem("star_ship"+i+"y",ships[i].y)
+    localStorage.setItem("star_ship"+i+"z",ships[i].z)
+    localStorage.setItem("star_ship"+i+"speed",ships[i].speed)
+    localStorage.setItem("star_ship"+i+"warp",ships[i].warp)
+    localStorage.setItem("star_ship"+i+"fuel",ships[i].fuel)
+    }
+    
+    localStorage.setItem("star_Cstars",colonizedStars+",")}
+    */
+    setInterval(update, 20)
+</script>

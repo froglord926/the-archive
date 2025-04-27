@@ -1,0 +1,181 @@
+<style>
+select.customize{
+position:static;
+width:100%;
+height:14%;
+font-size:60px;
+background-color: #4CAF50;
+border-width: 1;
+color: white;
+padding: 15px 32px;
+text-align: center;
+display: inline-block;
+}
+select.customize:hover{
+background-color: #21a526;
+
+}
+div#select{
+position:absolute;
+right:50;
+height:1000px;
+width:400px;
+top:15%;
+font: 60px arial, sans-serif;
+}
+div#selectbar{
+position:absolute;
+top:0%;
+height:10%;
+width:100%;
+background-color:#4CAF50;
+color: white;
+font-size:60px;
+ font: 60px arial, sans-serif;
+ left:0%
+}
+canvas{
+position:absolute;
+right:470px;
+background:#fce18f;
+top:15%;
+
+}
+#menu{position:absolute;top:0%;height:100%; width:15%;left:40%;text-align:center; background:#21a526;}
+#nav{position:absolute;top:0%;height:100%; width:25%;left:55%;text-align:center;}
+#about{position:absolute;top:0%;height:100%; width:20%;left:80%;text-align:center;}
+#logo{height:100%}
+</style> 
+<div id='selectbar'><img src='logo.png' id='logo' />Burrito Burrito
+<div onclick='window.location.replace("burrito.html")'' id='menu'>Menu</div>
+<div onclick='window.location.replace("BBproject_directions.html")' id='nav' >Directions</div>
+<div onclick='window.location.replace("BB project.html")'' id='about'>About</div>
+
+
+</div>
+<div id = 'content'>
+<div id='select'>
+<select class='customize' id='1'>
+  <option value="0">Tortilla</option>
+  <option value="0">Wheat</option>
+  <option value="1">Corn</option>
+</select>
+<select class='customize' id='2'>
+  <option value="n">Sauce</option>
+  <option value="0">Sour Cream</option>
+  <option value="1">Guacamole</option>
+  <option value="2">Jalapeno</option>
+</select>
+<select class='customize' id='3'>
+  <option value="n">Rice</option>
+  <option value="0">Brown</option>
+  <option value="1">White</option>
+</select>
+<select class='customize' id='4'>
+  <option value="n">Cheese</option>
+  <option value="0">Cheddar</option>
+  <option value="1">Mozzarella</option>
+</select>
+<select class='customize' id='5'>
+  <option value="n">Beans</option>
+  <option value="0">Brown</option>
+  <option value="1">Black</option>
+</select>
+<select class='customize' id='6'>
+  <option value="n">Meat</option>
+  <option value="0">Steak</option>
+  <option value="1">Chicken</option>
+  <option value="2">Pork</option>
+  <option value="3">Ground Beef</option>
+</select>
+<select class='customize' id='7'>
+  <option value="n">Extras</option>
+  <option value="0">Pico</option>
+  <option value="1">Peppers</option>
+</select>
+</div>
+<div id='cnvs'></div>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.5.3/p5.js"></script>
+<script> 
+var ranrice = []
+for(var o = 0; o<500 ;o++){ranrice[o] = Math.random()*600+200}
+var ranrice2 = []
+for(var o = 0; o<500 ;o++){ranrice2[o] = Math.random()*600+200}
+var rancheese = []
+for(var o = 0; o<50 ;o++){rancheese[o] = Math.random()*600+200}
+var rancheese2 = []
+for(var o = 0; o<50 ;o++){rancheese2[o] = Math.random()*600+200}
+var ranbean = []
+for(var o = 0; o<50 ;o++){ranbean[o] = Math.random()*600+200}
+var ranbean2 = []
+for(var o = 0; o<50 ;o++){ranbean2[o] = Math.random()*600+200}
+var ranmeat = []
+for(var o = 0; o<500 ;o++){ranmeat[o] = Math.random()*600+200}
+var ranmeat2 = []
+for(var o = 0; o<500 ;o++){ranmeat2[o] = Math.random()*600+200}
+var extrar = []
+for(var o = 0; o<500 ;o++){extrar[o] = Math.random()*600+200}
+var extrar2 = []
+for(var o = 0; o<500 ;o++){extrar2[o] = Math.random()*600+200}
+var extrar3 = []
+for(var o = 0; o<500 ;o++){extrar3[o] = Math.random()*600+200}
+var extrar4 = []
+for(var o = 0; o<500 ;o++){extrar4[o] = Math.random()*600+200}
+
+var tortillas = {
+s0:function(){fill('#d8dd9d');ellipse(500,500,1000,1000)},
+s1:function(){fill('#f6ff91');ellipse(500,500,1000,1000)},
+}
+var sauce = {
+sn:function(){},
+s0:function(){fill('#fefff4');ellipse(500,500,200,200)},
+s1:function(){fill('#79ba4e');ellipse(500,500,200,200)},
+s2:function(){fill('#ff0000');ellipse(500,500,200,200)},
+}
+var rice = {
+sn:function(){},
+s0:function(){fill('#995a18');for(var i=0;i<500;i++){rect(ranrice[i],ranrice2[i],10,30)};},
+s1	:function(){fill('#e4e5de');for(var i=0;i<500;i++){rect(ranrice[i],ranrice2[i],10,30)};},
+}
+var cheese = {
+sn:function(){},
+s0:function(){fill('#ffe947');for(var i=0;i<50;i++){rect(rancheese[i],rancheese2[i],10,60)};},
+s1:function(){fill('#e4e5de');for(var i=0;i<50;i++){rect(rancheese[i],rancheese2[i],10,60)};},
+}
+var bean = {
+sn:function(){},
+s0:function(){fill('#ce9444');for(var i=0;i<50;i++){ellipse(ranbean[i],ranbean2[i],20,30)};},
+s1:function(){fill('#543d1f');for(var i=0;i<50;i++){ellipse(ranbean[i],ranbean2[i],20,30)};},
+}
+var meat = {
+sn:function(){},
+s0:function(){fill('#664a27');for(var i=0;i<50;i++){rect(ranmeat[i],ranmeat2[i],60,40)};}, // steak
+s1:function(){fill('#d6c398');for(var i=0;i<50;i++){rect(ranmeat[i],ranmeat2[i],80,20)};}, // chicken
+s2:function(){fill('#d6a098	');for(var i=0;i<50;i++){rect(ranmeat[i],ranmeat2[i],30,30)};}, // pork
+s3:function(){fill('#754d19');for(var i=0;i<500;i++){ellipse(ranmeat[i],ranmeat2[i],20,20)};}, // ground beef
+}
+var extras = {
+sn:function(){},
+s0:function(){fill('#ed6c49');for(var i=0;i<100;i++){rect(extrar[i],extrar2[i],20,30)};fill('#3ead22');for(var i=0;i<300;i++){rect(extrar3[i],extrar4[i],10,10)};},
+s1:function(){fill('#ff0000');for(var i=0;i<50;i++){rect(extrar[i],extrar2[i],40,20)};},
+}
+function setup(){var canvas = createCanvas(1000,1000)
+canvas.parent('cnvs');
+}
+function draw(){
+
+
+eval('tortillas.s'+document.getElementById("1").options[document.getElementById("1").selectedIndex].value+'()')
+eval('sauce.s'+document.getElementById("2").options[document.getElementById("2").selectedIndex].value+'()')
+eval('rice.s'+document.getElementById("3").options[document.getElementById("3").selectedIndex].value+'()')
+eval('cheese.s'+document.getElementById("4").options[document.getElementById("4").selectedIndex].value+'()')
+eval('bean.s'+document.getElementById("5").options[document.getElementById("5").selectedIndex].value+'()')
+eval('meat.s'+document.getElementById("6").options[document.getElementById("6").selectedIndex].value+'()')
+eval('extras.s'+document.getElementById("7").options[document.getElementById("7").selectedIndex].value+'()')
+
+}
+
+
+
+</script>

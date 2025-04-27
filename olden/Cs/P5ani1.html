@@ -1,0 +1,38 @@
+<script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.5.3/p5.js"></script><script>
+var x = 100
+var y = 900
+var vx = -2
+var vy = 3
+var sheild =0
+
+
+function setup(){
+createCanvas(1000,1000);
+strokeWeight(0);
+}
+function draw() {
+clear();
+if(x > 900 || x <100){
+vx = -vx
+if(sheild == 30){sheild = 0 
+}else(sheild = 30)
+}
+if(y > 900 || y <100){
+vy = -vy
+}
+x+=vx
+y+=vy
+fill('red')
+rect(x,y,50,30)
+fill('#7bebf2')
+rect(x+sheild,y,20,20)
+fill('black')
+ellipse(x+10,y+30,20,20)
+ellipse(x+40,y+30,20,20)
+fill('gray')
+ellipse(x+10,y+30,10,10)
+ellipse(x+40,y+30,10,10)
+
+
+}
+</script>

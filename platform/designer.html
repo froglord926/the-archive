@@ -1,0 +1,214 @@
+<style>
+    canvas {
+        position: absolute;
+        top: 0%;
+        left: 0%;
+        width: 100%;
+        height: 100%;
+		z-index:-100;
+    }
+	.noclick {
+	-webkit-user-select: none; /* Safari */        
+-moz-user-select: none; /* Firefox */
+-ms-user-select: none; /* IE10+/Edge */
+user-select: none; /* Standard */
+	}
+	#buttonMaker{
+	width:50%;
+	height:50%;
+	background-color:#00ff00;
+	position:absolute;
+	top:25%;
+	left:25%;
+	z-index:-101;
+	}
+	#options{
+	background-color:#00ff00;
+	position:absolute;
+	z-index:-101;
+	}
+</style>
+<canvas width='100' height='100' id='canvas1'> </canvas>
+<div id='options'>
+<input id='copypaste'></input>
+<input class = 'noclick' id='clicking' type='range' value='10'></input><span id='boxTick'></span>
+<input class = 'noclick' id='color' type='color'></input><span id='boxTick'></span>
+<select id='sideSelect' class='noclick'>
+  <option value="0">top</option>
+  <option value="2">bottom</option>
+  <option value="1">left</option>
+  <option value="3">right</option>
+</select>
+<input class='noclick' id='lineId' value='0.1'></input>
+</div>
+<div id='buttonMaker'>
+function
+<input id='buttFucnt' class='noclick'></input>
+<center><button onclick='makeButton()' class='noclick'>Done</button></center>
+</div>
+
+<script>
+            var WIDTH = window.innerWidth
+            var HEIGHT = window.innerHeight
+            document.getElementById('canvas1').width = WIDTH // setting canvas size
+            document.getElementById('canvas1').height = HEIGHT
+var gameCanvas = document.getElementById('canvas1').getContext('2d')
+var text = []
+var planets = []
+var death = []
+var lines = []
+var buttons = []
+var finish = []
+var level = document.getElementById('copypaste')
+level.value = 'lines = [[0,600,WIDTH,0,"rgb(0,0,0)"],[0,700,HEIGHT,1,"rgb(0,0,0)"],[0,30,WIDTH,2,"rgb(0,0,0)"],[0,30,HEIGHT,3,"rgb(0,0,0)"],];'
+level.value += 'for (var i in players){players[i].x = 50;players[i].y = 50};'
+lines = [[0,600,WIDTH,0,'rgb(0,0,0)'],[0,700,HEIGHT,1,'rgb(0,0,0)'],[0,30,WIDTH,2,'rgb(0,0,0)'],[0,30,HEIGHT,3,'rgb(0,0,0)'],];
+document.getElementById('options').style.zIndex = -120
+makeButton = function(){
+document.getElementById('buttonMaker').style.zIndex = -101
+buttons.unshift([mouse.x,mouse.y,function(){},document.getElementById('color').value])
+level.value+= 'buttons.unshift(['+mouse.x+','+mouse.y+',function(){'+document.getElementById('buttFucnt').value+'},'+"'"+document.getElementById('color').value+"'"+']);'
+}
+box  =function(x,y,w,h,color='rgb(0,0,0)'){  // easy generate boxes
+                lines.unshift([x,y,w,0,color])
+                lines.unshift([y,x,h,1,color])
+                lines.unshift([x,y+h,w,2,color])
+                lines.unshift([y,x+w,h,3,color])
+            }
+update = function(){
+gameCanvas.fillStyle = 'rgb(255,255,255)'
+gameCanvas.fillRect(0,0,WIDTH,HEIGHT)
+document.getElementById('boxTick').innerHTML = document.getElementById('clicking').value
+for(var i = 0;i<=WIDTH;i+= parseInt(document.getElementById('clicking').value)){
+gameCanvas.strokeStyle = 'rgb(180,180,180)'
+gameCanvas.beginPath()
+gameCanvas.moveTo(i,0)
+gameCanvas.lineTo(i,HEIGHT)
+gameCanvas.stroke()
+gameCanvas.closePath()
+}
+for(var i = 0;i<WIDTH;i+= parseInt(document.getElementById('clicking').value)){
+gameCanvas.strokeStyle = 'rgb(180,180,180)'
+gameCanvas.beginPath()
+gameCanvas.moveTo(0,i)
+gameCanvas.lineTo(WIDTH,i)
+gameCanvas.stroke()
+gameCanvas.closePath()
+}
+
+for (var i in text){			//drawing text
+gameCanvas.strokeStyle = text[i][3]
+gameCanvas.strokeText(text[i][0],text[i][1],text[i][2])
+}
+for(var i in death){
+for(var o = death[i][1];o<death[i][1]+death[i][3];o+=5){
+for(var p = death[i][0];p<death[i][0]+death[i][2];p+=5){
+gameCanvas.fillStyle = 'rgb(255,'+(Math.floor(Math.random()*100)+50)+','+(Math.floor(Math.random()*100)+50)+')'
+gameCanvas.fillRect(p,o,5,5)
+}}
+//gameCanvas.fillRect(death[i][0],death[i][1],death[i][2],death[i][3])
+}
+for(var i in planets){				// drawing gravity sources
+gameCanvas.strokeStyle = planets[i].color
+gameCanvas.beginPath()
+gameCanvas.arc(planets[i].x,planets[i].y,planets[i].radius,0,2*Math.PI)
+gameCanvas.stroke()
+gameCanvas.closePath()
+}
+for(var i in lines){			//drawing lines
+gameCanvas.strokeStyle = lines[i][4]
+gameCanvas.beginPath()
+if(lines[i][3] % 2 == 0){
+gameCanvas.moveTo(lines[i][0],lines[i][1])
+gameCanvas.lineTo(lines[i][0]+lines[i][2],lines[i][1])}
+else{
+gameCanvas.moveTo(lines[i][1],lines[i][0])
+gameCanvas.lineTo(lines[i][1],lines[i][0]+lines[i][2])}
+gameCanvas.stroke()
+}
+for(var i in buttons){		// drawing buttons
+gameCanvas.fillStyle = buttons[i][3]
+gameCanvas.fillRect(buttons[i][0]-2,buttons[i][1]-2,4,4)
+}
+if(mouse.down){
+let threshold = document.getElementById('clicking').value
+gameCanvas.strokeRect(Math.round(mouse.x/threshold)*threshold,Math.round(mouse.y/threshold)*threshold,Math.round((mouse.nx-mouse.x)/threshold)*threshold,Math.round((mouse.ny-mouse.y)/threshold)*threshold)
+}
+
+}
+var mouse = {
+x:0,
+y:0,
+nx:0,
+ny:0,
+down:false,
+}
+document.onmousedown = function(event){
+//console.log(event.x+','+event.y)
+if(!( event.target.className == 'noclick')){
+if(!event.ctrlKey){
+mouse.x = event.x
+mouse.y = event.y
+mouse.down = 1
+}else{
+mouse.x = event.x
+mouse.y = event.y
+mouse.down = 2
+}
+if(event.altKey){
+mouse.x = event.x
+mouse.y = event.y
+document.getElementById('buttonMaker').style.zIndex = 100
+}
+if(event.shiftKey){
+mouse.x = event.x
+mouse.y = event.y
+mouse.down = 3
+}
+}
+}
+document.onmousemove = function(event){
+mouse.nx = event.x
+mouse.ny = event.y
+}
+document.onmouseup = function(event){
+if(mouse.down){
+var threshold = document.getElementById('clicking').value
+//console.log(threshold)
+if(!( event.target.className == 'noclick')){
+//console.log(event)
+if(mouse.down == 1){
+level.value += 'box('+Math.round(Math.min(mouse.x,event.x)/threshold)*threshold+','+Math.round(Math.min(mouse.y,event.y)/threshold)*threshold+','+Math.round(Math.max((event.x-mouse.x),-(event.x-mouse.x))/threshold)*threshold+','+Math.round(Math.max((event.y-mouse.y),-(event.y-mouse.y))/threshold)*threshold+','+"'"+document.getElementById('color').value+"'"+');'
+box(Math.round(mouse.x/threshold)*threshold,Math.round(mouse.y/threshold)*threshold,Math.round((event.x-mouse.x)/threshold)*threshold,Math.round((event.y-mouse.y)/threshold)*threshold,document.getElementById('color').value)
+mouse.down = 0
+}else if(mouse.down == 2){
+var type = document.getElementById('sideSelect').value
+var id = document.getElementById('lineId')
+if(type % 2 == 0){
+lines[id.value] = ([Math.round(Math.min(mouse.x,event.x)/threshold)*threshold,Math.round(Math.min(mouse.y,event.y)/threshold)*threshold,Math.round(Math.max((event.x-mouse.x),-(event.x-mouse.x))/threshold)*threshold,type,document.getElementById('color').value])
+level.value += 'lines['+id.value+'] = ['+Math.round(Math.min(mouse.x,event.x)/threshold)*threshold+','+Math.round(Math.min(mouse.y,event.y)/threshold)*threshold+','+Math.round(Math.max((event.x-mouse.x),-(event.x-mouse.x))/threshold)*threshold+','+type+','+"'"+document.getElementById('color').value+"'"+'];'
+
+}
+else{
+lines[id.value] = [Math.round(Math.min(mouse.y,event.y)/threshold)*threshold,Math.round(Math.min(mouse.x,event.x)/threshold)*threshold,Math.round(Math.max((event.y-mouse.y),-(event.y-mouse.y))/threshold)*threshold,type,document.getElementById('color').value]
+level.value += 'lines['+id.value+'] = ['+Math.round(Math.min(mouse.y,event.y)/threshold)*threshold+','+Math.round(Math.min(mouse.x,event.x)/threshold)*threshold+','+Math.round(Math.max((event.y-mouse.y),-(event.y-mouse.y))/threshold)*threshold+','+type+','+"'"+document.getElementById('color').value+"'"+'];'
+}
+id.value++
+
+mouse.down = 0
+}else if(mouse.down == 3){
+level.value += 'death.unshift(['+Math.round(Math.min(mouse.x,event.x)/threshold)*threshold+','+Math.round(Math.min(mouse.y,event.y)/threshold)*threshold+','+Math.round(Math.max((event.x-mouse.x),-(event.x-mouse.x))/threshold)*threshold+','+Math.round(Math.max((event.y-mouse.y),-(event.y-mouse.y))/threshold)*threshold+']);'
+death.unshift([Math.round(mouse.x/threshold)*threshold,Math.round(mouse.y/threshold)*threshold,Math.round((event.x-mouse.x)/threshold)*threshold,Math.round((event.y-mouse.y)/threshold)*threshold])
+mouse.down = 0
+}
+}
+}}
+document.onkeydown = function(event){
+if(event.key == 'm'){
+document.getElementById('options').style.zIndex = -parseInt(document.getElementById('options').style.zIndex)
+}
+}
+
+
+setInterval(update,1000/10)
+</script>

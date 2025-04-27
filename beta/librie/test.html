@@ -1,0 +1,21 @@
+<canvas id='ctx' width='1000' height='1000'></canvas>
+<script src='library.js'></script>
+<script>
+lib.setCanvas('ctx')
+console.log(lib.defaultCanvas)
+var frames = 0
+update = function(){
+
+lib.defaultCanvas.clearRect(0,0,1000,1000)
+/*lib.draw.rect(100,100,100,100,'v',0,0,frames,false)*/
+lib.draw.rect(100,250,100,100,0,'black',0,0,frames)
+//lib.draw.rect(0,0,0,lib.WIDTH,lib.HEIGHT,'rgb(255,20,255)',0,0,12)
+//lib.draw.rect(0,0,frames,1000,1000)
+//lib.draw.rect(100,250,0,100,100,'rgba(0,0,255,.5)',0,frames,0,true)
+//lib.draw.rect(100,250,0,100,100,'rgba(255,0,0,.5)',frames,0,0,true)
+frames++
+//lib.draw.rect(100,250,100,100,'green',frames,frames,0,true)
+}
+update()
+setInterval(update,1000/1)
+</script>

@@ -1,0 +1,61 @@
+<script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.5.3/p5.js"></script><script>
+function setup(){
+createCanvas(1000,1000);
+strokeWeight(0);
+ newcoin()
+  newcoin()
+   newcoin()
+}
+ting = {
+x:500,
+y:500,
+vx:0,
+vy:0,
+}
+var coins = {}
+var score = 0
+function newcoin(){
+newcoins = {
+x:Math.random()*900+50,
+y:Math.random()*900+50,
+}
+coins[Math.random()]=newcoins
+}
+document.onkeydown = function (event) {
+if (event.keyCode === 39) { ting.vx+=0.1}
+if (event.keyCode === 37) { ting.vx-=0.1}
+if (event.keyCode === 38) { ting.vy-=0.1}
+if (event.keyCode === 40) { ting.vy+=0.1}
+
+
+
+
+}
+function draw() {
+clear()
+background('#6ae6fc')
+fill('#eff927')
+textFont('Arial',200)
+text(score, 10, 200)
+for (var i in coins){
+fill('#eff927')
+ellipse(coins[i].x,coins[i].y,20,20)
+
+if(Math.abs(ting.x - coins[i].x) <=50 && Math.abs(ting.y - coins[i].y) <=50){
+score++
+ newcoin()
+delete coins[i]
+}
+}
+ ting.y+=ting.vy
+ ting.x+=ting.vx
+ if(ting.x<=0){ting.x = 0;ting.vx = -ting.vx/4*3}
+if(ting.y<=0){ting.y = 0;ting.vy = -ting.vy/4*3}
+if(ting.x>=950){ting.x = 950;ting.vx = -ting.vx/4*3}
+if(ting.y>=950){ting.y = 950;ting.vy = -ting.vy/4*3}
+
+fill('#97a098')
+ellipse(ting.x+25,ting.y+25,50,50)
+fill('#51cde2')
+ellipse(ting.x+25,ting.y+25,20,20)}
+</script>

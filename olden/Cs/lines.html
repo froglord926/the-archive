@@ -1,0 +1,45 @@
+<style>
+#ctx{
+	position:absolute;
+	top:0%;
+	right:0%;
+	height:100%;
+	width:100%;
+	cursor:none;
+	}
+</style>
+<canvas id="ctx" width="1000" height="1000"></canvas>
+<script>
+
+var width = 1000
+var height = 1000
+var x = 0 
+var y = height
+var ctx= document.getElementById('ctx').getContext('2d')
+var scalex = 1000//prompt("X scale")
+ctx.lineWidth=10
+ctx.fillStyle = "#111111"
+ctx.strokeStyle = "#ededff"
+var point = [500,500]
+x=0
+y = 500
+function update(){
+ctx.fillRect(0,0,width,height)
+
+
+//while(Math.sqrt((x-point[0])*(x-point[0])+(y-point[1])*(y-point[1]))>10){
+	ctx.beginPath();
+ctx.moveTo(x,y);
+if(x<point[0])
+x += Math.random()* scalex
+if(x>point[0])
+x -= Math.random()* scalex
+if(x<point[0])
+y += Math.random()* scalex
+if(x>point[0])
+y -= Math.random()* scalex
+ctx.lineTo(x,y);
+ctx.stroke();
+	}}//}
+setInterval(update,1000/30)
+</script>

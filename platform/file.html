@@ -1,0 +1,500 @@
+<style>
+    canvas {
+        position: absolute;
+        top: 0%;
+        left: 0%;
+        width: 100%;
+        height: 100%;
+    }
+</style>
+<canvas width='100' height='100' id='canvas1'> </canvas>
+        <img>
+        <script>
+            var WIDTH = window.innerWidth
+            var HEIGHT = window.innerHeight
+            document.getElementById('canvas1').width = WIDTH // setting canvas size
+            document.getElementById('canvas1').height = HEIGHT
+            var gameCanvas = document.getElementById('canvas1').getContext('2d')
+            var level = 0
+			var frames = 0
+            var inLevel = false
+            planets = [    // gravity sources
+            {x:40,
+                y:50,
+                radius:4,
+                grav:1,
+                color:'rgb(0,100,0)'
+            }]
+            var lines = []   //objects
+            var finish = []
+            var effects = []
+			var death = []
+            var buttons = [[190,300,function(){console.log('hi')},'rgb(0,0,0)']]
+            var text = [['hi',200,200,'rgb(10,100,200)']]
+            gameCanvas.font = "20px	 Arial";
+            var playerCount = 1
+            var players = []
+			var skins = [
+			[function(){gameCanvas.strokeStyle = 'rgb(0,0,0)';gameCanvas.strokeRect(this.x-(this.size/2),this.y-(this.size/2),this.size,this.size)},function(){},true,'rgb(0,0,0)'],
+			[function(){gameCanvas.strokeStyle = 'rgb(255,0,0)';gameCanvas.strokeRect(this.x-(this.size/2),this.y-(this.size/2),this.size,this.size)},function(){this.accRate = 0.2},false,'rgb(255,0,0)'],
+			[function(){gameCanvas.strokeStyle = 'rgb(0,255,255)';gameCanvas.strokeRect(this.x-(this.size/2),this.y-(this.size/2),this.size,this.size)},function(){this.gravAcc = -0.1},false,'rgb(0,255,255)'],
+			[function(){gameCanvas.strokeStyle = 'rgb(0,255,0)';gameCanvas.strokeRect(this.x-(this.size/2),this.y-(this.size/2),this.size,this.size)},function(){this.jumpAcc = 5},false,'rgb(0,255,0)'],
+			[function(){gameCanvas.strokeStyle = 'rgb(205,205,0)';gameCanvas.strokeRect(this.x-(this.size/2),this.y-(this.size/2),this.size,this.size)},function(){this.maxSpeed = 10},false,'rgb(205,205,0)'],
+			[function(){gameCanvas.strokeStyle = 'rgb(10,10,10)';gameCanvas.strokeRect(this.x-(this.size/2),this.y-(this.size/2),this.size,this.size)},function(){this.size = 5},false,'rgb(100,100,100)'],
+			[function(){gameCanvas.strokeStyle = 'rgb(0,0,255)';gameCanvas.strokeRect(this.x-(this.size/2),this.y-(this.size/2),this.size,this.size)},function(){effects.unshift(function(thing){thing.canJump = true})},false,'rgb(0,0,0)'],
+			[function(){gameCanvas.strokeStyle = 'rgb(0,0,255)';gameCanvas.strokeRect(this.x-(this.size/2),this.y-(this.size/2),this.size,this.size)},function(){this.gravAcc = 0.1/6.04938271605},false,'rgb(0,0,0)'],
+			]
+			var tempStorage = []
+			var tempString = '' 
+			var unlockedSkins = localStorage.getItem('pltSkins') || ''
+			for(var i  = 0 ; i< unlockedSkins.length;i++){
+			if(localStorage.getItem('pltSkins').charAt(i) == '|'){tempStorage.unshift(parseInt(tempString));tempString = ''}else{tempString+=localStorage.getItem('pltSkins').charAt(i)}
+			}
+			for (var i in tempStorage){skins[tempStorage[i]][2] = true}
+			players = [{
+                    x:150,
+                    y:150,
+                    velx:0,
+                    vely:0,
+                    size:10,
+                    accRate:.1,
+					jumpAcc:3,
+					maxSpeed:5,
+                    drawing:function(){gameCanvas.strokeStyle = 'rgb(0,0,0)';gameCanvas.strokeRect(this.x-(this.size/2),this.y-(this.size/2),this.size,this.size)},
+					perks : function(){},
+                    acc:0,
+                    canJump:0,
+                    canGrav:true,
+                    gravAcc:0.1,
+                    keybinds:{
+                        up:'w',
+                        left:'a',
+                        down:'s',
+                        right:'d'}
+                },]
+
+
+
+            box  =function(x,y,w,h,color='rgb(0,0,0)'){  // easy generate boxes
+                lines.unshift([x,y,w,0,color])
+                lines.unshift([y,x,h,1,color])
+                lines.unshift([x,y+h,w,2,color])
+                lines.unshift([y,x+w,h,3,color])
+            }
+                var levels = [		// levels
+                function(){
+                    
+                    lines = [[0,300,1000,0,'rgb(0,0,0)'],[0,300,1000,1,'rgb(0,0,0)'],[0,30,1000,2,'rgb(0,0,0)'],[0,30,1000,3,'rgb(0,0,0)'],];
+					text.unshift(['game title',30,50,'rgb(0,0,0)'])
+					text.unshift(['levels',30,300,'rgb(0,0,0)'])
+					box(30,280,60,20)
+                    box(200,200,50,50,'rgb(255,0,0)');
+                    
+					buttons.unshift([55,270,function(){level = 0.1;inLevel = false},'rgb(0,0,0)'])
+					buttons.unshift([275,270,function(){level = 0.2;inLevel = false},'rgb(0,0,0)'])
+					box(250,280,50,20)
+					text.unshift(['skins',250,300,'rgb(0,0,0)'])
+					//
+					for (var i in players){
+                        players[i].x = 50
+                        players[i].y = 50
+                    
+				}	
+				
+                },
+                function(){
+                   
+                    text = [['circles attract and repel',70,HEIGHT-200,'rgb(0,0,0)'],['at high velocity',380,HEIGHT-200,'rgb(0,0,0)'],['you can go',380,HEIGHT-180,'rgb(0,0,0)'],['through walls',380,HEIGHT-160,'rgb(0,0,0)'],['one way walls',50,HEIGHT-450,'rgb(0,0,0)']]
+                   
+                    lines = [[0,HEIGHT-30,WIDTH,0,'rgb(0,0,0)'],[0,700,HEIGHT,1,'rgb(0,0,0)'],[0,30,WIDTH,2,'rgb(0,0,0)'],[0,30,HEIGHT,3,'rgb(0,0,0)'],];
+                    //box(200,200,50,50);
+                    box(520,HEIGHT-215,20,185)
+                    box(60,HEIGHT-235,640,20)
+                    for(var i=55;i<200;i+=10){lines.unshift([680,HEIGHT-i,20,0,'rgb(0,0,0)'])}
+                    box(70,30,20,HEIGHT-500)
+                    box(30,HEIGHT-450,650,20)
+                    finish = [690,HEIGHT-205,10]
+                    lines.unshift([HEIGHT-215,680,160,1,'rgb(0,0,0)'])
+                    lines.unshift([160,HEIGHT-480,450,2,'rgb(0,0,0)'])
+                    box(130,HEIGHT-490,30,20)
+                    for (var i= 190;i<620;i+=60){
+                        box(i,HEIGHT-490,30,10)
+                    }
+                    box(640,HEIGHT-490,20,40)
+                    box(140,30,20,HEIGHT-550)
+                    for(var i=60;i<620;i+=60){
+                        box(i,HEIGHT-430,20,150)
+                    }
+                    for(var i=90;i<620;i+=60){
+                        box(i,HEIGHT-385,20,150)
+                    }
+
+                    planets.unshift({x:80,y:HEIGHT-225,radius:4,grav:-1,color:'rgb(0,0,0)'},{x:530,y:HEIGHT-190,radius:4,grav:1,color:'rgb(0,0,0)'})
+
+                    for (var i in players){
+                        players[i].x = 50
+                        players[i].y = HEIGHT-600}
+                },
+                function(){
+                    lines = [[0,HEIGHT-30,WIDTH,0,'rgb(0,0,0)'],[0,700,HEIGHT,1,'rgb(0,0,0)'],[0,30,WIDTH,2,'rgb(0,0,0)'],[0,30,HEIGHT,3,'rgb(0,0,0)'],];
+                   
+                    finish = []
+                    lines[0.123] = [30,HEIGHT-500,100,0,'rgb(0,0,255)']
+                    buttons.unshift([120,HEIGHT-510,function(){delete lines[0.123];delete text[0.123]},'rgb(0,0,255)'])
+                    box(130,30,20,HEIGHT-530)
+                    text[0.123] = (['whats this',30,HEIGHT-480,'rgb(0,0,255)'])
+                    box(30,HEIGHT-480,300,20)
+                    lines[0.111] = [290,HEIGHT-400,350,0,'rgb(255,0,0)']
+                    box(290,HEIGHT-460,20,60)
+                    box(620,HEIGHT-460,20,60)
+                    box(600,HEIGHT-480,100,20)
+                    buttons[0.111] = [320,HEIGHT-410,function(){text.unshift(['r to restart',320,HEIGHT-400,'rgb(0,0,0)'])},'rgb(255,0,0)']
+                    buttons.unshift([690,HEIGHT-490,function(){delete buttons[0.111];delete lines[0.111]},'rgb(0,0,0)'])
+                    box(60,HEIGHT-350,640,20)
+                    box(30,HEIGHT-280,640,20)
+                    box(650,HEIGHT-300,20,20)
+                    buttons.unshift([40,HEIGHT-290,function(){box(30,HEIGHT-350,30,20);for(var i=0.1;i<1.1;i+=0.02){planets[i] = {x:i*640-30,y:HEIGHT-270,radius:4,grav:-0.2,color:'rgb(0,0,0)'}}},'rgb(0,0,0)'])
+                    buttons.unshift([660,HEIGHT-310,function(){for(var i=0.1;i<1.1;i+=0.02){planets[i] = {x:i*640-30,y:HEIGHT-270,radius:4,grav:0.2,color:'rgb(0,0,0)'}}},'rgb(0,0,0)'])
+                    buttons.unshift([40,HEIGHT-250,function(){delete lines[2.6];for(var i=0.1;i<1.1;i+=0.02){delete planets[i]}},'rgb(0,255,0)']	)
+                    lines[2.6] = [30,HEIGHT-200,670,0,'rgb(0,255,0)']
+                    lines.unshift([30,HEIGHT-220,650,2,'rgb(0,0,0)'])
+                    //finish = [660,HEIGHT-19	0,10]
+                    box(90,HEIGHT-200,20,40)
+                    box(30,HEIGHT-140,80,20)
+                    buttons.unshift([100,HEIGHT-150,function(){
+                        box(200,HEIGHT-200,10,150)
+                        box(210,HEIGHT-60,140,10)
+                        box(340,HEIGHT-190,10,130)
+                        box(220,HEIGHT-190,120,10)
+                        box(220,HEIGHT-180,10,110)
+                        box(230,HEIGHT-80,100,10)
+                        box(320,HEIGHT-170,10,90)
+                        box(240,HEIGHT-170,80,10)
+                        box(240,HEIGHT-160,10,70)
+                        planets.unshift({x:280,y:HEIGHT-125,radius:4,grav:25,color:'rgb(0,0,0)'})
+                        finish = [280,HEIGHT-125,10]
+                    },'rgb(0,0,0)'])
+					buttons.unshift([660,HEIGHT-410,function(){skins[1][2] = true},'rgb(220,220,220)'])
+                    for (var i in players){
+                        players[i].x = 50
+                        players[i].y = HEIGHT-600}
+                },
+                function(){
+                    
+                    lines = [[0,HEIGHT-30,WIDTH,0,'rgb(0,0,0)'],[0,700,HEIGHT,1,'rgb(0,0,0)'],[0,30,WIDTH,2,'rgb(0,0,0)'],[0,30,HEIGHT,3,'rgb(0,0,0)'],];
+                    box(30,HEIGHT-550,200,20)
+                    effects.unshift(function(thing){thing.canJump = 1})
+                    text.unshift(['uh oh, where is gravity',30,HEIGHT-550,'rgb(0,0,0)'])
+                    box(30,HEIGHT-90,100,20)
+                    lines[0.1] = [HEIGHT-70,60,40,3,'rgb(255,0,0)']
+                    lines[0.2] = [HEIGHT-70,80,40,3,'rgb(0,255,0)']
+                    lines[0.3] = [HEIGHT-70,100,40,3,'rgb(0,0,255)']
+                    lines[0.4] = [HEIGHT-70,120,40,3,'rgb(0,255,255)']
+                    buttons.unshift([Math.random()*670+30,Math.random()*(HEIGHT-60)+30,function(){delete lines[0.1]},'rgb(255,0,0)'])
+                    buttons.unshift([Math.random()*670+30,Math.random()*(HEIGHT-60)+30,function(){delete lines[0.2]},'rgb(0,255,0)'])
+                    buttons.unshift([Math.random()*670+30,Math.random()*(HEIGHT-60)+30,function(){delete lines[0.3]},'rgb(0,0,255)'])
+                    buttons.unshift([Math.random()*670+30,Math.random()*(HEIGHT-60)+30,function(){delete lines[0.4]},'rgb(0,255,255)'])
+					
+                    buttons.unshift([Math.random()*670+30,Math.random()*(HEIGHT-60)+30,function(){skins[2][2] = true},'rgb(220,220,220)'])
+                    for(var i = 0;i<20;i++){
+                        planets.unshift({x:Math.random()*670+30,y:Math.random()*(HEIGHT-60)+30,radius:4,grav:Math.random()*10-5,color:'rgb(0,0,0)'})
+                    }
+                    finish = [45,HEIGHT-50,10]
+                    for (var i in players){
+                        players[i].x = 50
+                        players[i].y = HEIGHT-600
+                        players[i].gravAcc = 0
+                    }
+
+                },
+				function(){
+				
+                lines = [[0,HEIGHT-30,WIDTH,0,'rgb(0,0,0)'],[0,700,HEIGHT,1,'rgb(0,0,0)'],[0,30,WIDTH,2,'rgb(0,0,0)'],[0,30,HEIGHT,3,'rgb(0,0,0)'],];
+				box()
+				for (var i in players){
+                        players[i].x = 50
+                        players[i].y = HEIGHT-600
+                    }
+				},
+                function(){
+				lines = [[0,600,WIDTH,0,"rgb(0,0,0)"],[0,700,HEIGHT,1,"rgb(0,0,0)"],[0,30,WIDTH,2,"rgb(0,0,0)"],[0,30,HEIGHT,3,"rgb(0,0,0)"],];for (var i in players){players[i].x = 50;players[i].y = 50};box(30,90,650,20,'#000000');box(680,260,0,0,'#000000');box(690,250,10,20,'#000000');box(660,110,10,120,'#000000');box(30,250,640,20,'#000000');box(700,130,0,0,'#000000');box(680,120,20,10,'#000000');box(670,140,20,10,'#000000');box(680,160,20,10,'#000000');box(670,180,20,10,'#000000');box(680,200,20,10,'#000000');box(670,220,20,10,'#000000');box(620,200,10,40,'#000000');box(580,160,0,0,'#000000');box(580,150,10,100,'#000000');box(510,200,30,50,'#000000');box(520,110,10,80,'#000000');box(410,160,10,40,'#000000');box(460,200,10,50,'#000000');box(310,150,70,10,'#000000');box(290,170,10,40,'#000000');box(220,210,10,10,'#000000');box(200,190,10,10,'#000000');box(160,160,10,10,'#000000');box(120,170,10,10,'#000000');box(60,140,10,110,'#000000');box(90,150,10,10,'#000000');box(80,130,10,10,'#000000');box(30,320,120,10,'#000000');box(160,320,110,10,'#000000');box(280,320,120,10,'#000000');box(460,330,0,0,'#000000');box(410,320,150,10,'#000000');box(700,330,0,0,'#000000');box(570,320,130,10,'#000000');box(480,380,0,0,'#000000');box(470,330,10,80,'#000000');box(480,410,0,0,'#000000');box(330,330,10,90,'#000000');box(340,420,0,0,'#000000');box(210,330,10,80,'#000000');box(470,410,10,10,'#000000');lines[0.1] = [30,400,180,0,'#ff0000'];lines[1.1] = [220,400,110,0,'#ff0000'];lines[2.1] = [480,400,220,0,'#ff0000'];lines[3.1] = [340,400,0,2,'#ff0000'];lines[4.1] = [340,400,130,2,'#ff0000'];box(720,260,0,0,'#00ff00');lines[5.1] = [670,250,20,0,'#00ff00'];box(40,240,0,0,'#00ff00');buttons.unshift([43,235,function(){delete lines[5.1]},'#00ff00']);lines[6.1] = [620,210,0,2,'#000000'];lines[7.1] = [70,210,550,2,'#000000'];box(30,460,670,10,'#000000');box(30,450,0,0,'#000000');buttons.unshift([34,453,function(){for(var i in players){players[i].y+=30}},'#000000']);box(670,420,30,10,'#000000');box(670,430,10,20,'#000000');box(670,450,10,5,'#000000');box(690,440,0,0,'#000000');buttons.unshift([691,443,function(){level = 0.1337;inLevel = false},'#000000']);box(350,500,10,90,'#000000');box(350,470,10,30,'#000000');box(380,470,10,120,'#000000');box(420,560,0,0,'#000000');box(410,470,10,50,'#000000');box(410,530,10,70,'#000000');box(430,500,230,100,'#000000');box(440,470,0,0,'#000000');box(440,470,10,20,'#000000');box(650,480,10,20,'#000000');box(450,480,190,10,'#000000');box(460,480,0,0,'#c8c8c8');buttons.unshift([455,475,function(){skins[3][2] = true},'#c8c8c8']);box(170,30,0,0,'#c8c8c8');box(100,30,0,0,'#c8c8c8');box(100,30,0,0,'#c8c8c8');
+				box(120,110,10,30,'#000000');box(200,110,10,60,'#000000');box(240,110,10,60,'#000000');box(330,110,10,20,'#000000');box(280,110,10,10,'#000000');box(400,110,10,10,'#000000');box(450,110,10,60,'#000000');box(100,30,0,0,'#000000');
+				finish = [690,590,10]
+				},
+				function(){
+				lines = [[0,600,WIDTH,0,"rgb(0,0,0)"],[0,700,HEIGHT,1,"rgb(0,0,0)"],[0,30,WIDTH,2,"rgb(0,0,0)"],[0,30,HEIGHT,3,"rgb(0,0,0)"],];for (var i in players){players[i].x = 50;players[i].y = 50};box(30,120,610,10,'#000000');box(700,150,0,0,'#000000');box(680,150,20,30,'#000000');box(250,170,420,50,'#000000');box(50,190,200,10,'#000000');box(630,150,50,20,'#000000');buttons.unshift([396,161,function(){levels[level]()},'#ff0000']);box(400,170,0,0,'#ff0000');box(440,140,0,0,'#ff0000');buttons.unshift([436,141,function(){levels[level]()},'#ff0000']);box(500,160,0,0,'#ff0000');buttons.unshift([501,156,function(){levels[level]()},'#ff0000']);box(540,150,0,0,'#ff0000');buttons.unshift([544,151,function(){levels[level]()},'#ff0000']);box(520,160,0,0,'#ff0000');buttons.unshift([521,163,function(){levels[level]()},'#ff0000']);box(320,140,0,0,'#ff0000');buttons.unshift([320,141,function(){levels[level]()},'#ff0000']);box(360,160,0,0,'#ff0000');buttons.unshift([358,155,function(){levels[level]()},'#ff0000']);box(250,140,0,0,'#ff0000');buttons.unshift([245,135,function(){levels[level]()},'#ff0000']);box(220,170,0,0,'#ff0000');buttons.unshift([223,170,function(){levels[level]()},'#ff0000']);box(280,160,0,0,'#ff0000');buttons.unshift([284,155,function(){levels[level]()},'#ff0000']);box(190,140,0,0,'#ff0000');buttons.unshift([190,140,function(){levels[level]()},'#ff0000']);box(170,170,0,0,'#ff0000');buttons.unshift([165,166,function(){levels[level]()},'#ff0000']);box(110,150,0,0,'#ff0000');buttons.unshift([105,146,function(){levels[level]()},'#ff0000']);box(120,180,0,0,'#ff0000');buttons.unshift([119,183,function(){levels[level]()},'#ff0000']);box(70,140,0,0,'#ff0000');buttons.unshift([65,138,function(){levels[level]()},'#ff0000']);box(80,170,0,0,'#ff0000');buttons.unshift([77,174,function(){levels[level]()},'#ff0000']);box(450,160,0,0,'#ff6464');buttons.unshift([447,160,function(){skins[4][2] = true},'#ff6464']);box(380,90,0,0,'#000000');box(30,290,630,10,'#000000');box(650,220,0,0,'#000000');box(650,220,10,20,'#000000');lines[0.1] = [450,240,190,0,'#000000'];lines[1.1] = [640,240,0,0,'#000000'];lines[2.1] = [640,240,20,0,'#000000'];lines[3.1] = [310,240,140,0,'#000000'];lines[4.1] = [190,240,120,0,'#000000'];lines[5.1] = [80,240,110,0,'#000000'];box(80,240,20,10,'#000000');box(50,270,0,0,'#000000');buttons.unshift([54,274,function(){for(var i in players){players[i].gravAcc = players[i].gravAcc}},'#000000']);box(680,180,0,0,'#000000');buttons.unshift([676,175,function(){for(var i in players){players[i].gravAcc = players[i].gravAcc;players[i].y += 180}},'#000000']);lines[6.1] = [670,180,10,0,'#000000'];box(660,260,10,30,'#000000');box(80,260,580,10,'#000000');box(90,280,0,0,'#000000');box(660,290,40,10,'#000000');box(190,240,10,10,'#000000');box(240,240,90,10,'#000000');box(120,240,30,10,'#000000');box(220,240,10,10,'#000000');box(360,240,100,10,'#000000');box(500,260,0,0,'#000000');box(490,240,10,10,'#000000');box(520,240,40,10,'#000000');box(590,240,60,10,'#000000');box(80,410,0,0,'#000000');box(70,390,630,10,'#000000');lines[7.1] = [330,190,0,3,'#000000'];lines[8.1] = [300,70,90,3,'#000000'];box(460,380,0,0,'#000000');buttons.unshift([464,376,function(){planets.unshift({x:75,y:395,radius:4,grav:-2,color:'rgb(0,0,0)'});delete lines[8.1]},'#000000']);box(90,560,570,10,'#000000');box(90,520,0,0,'#000000');box(90,520,570,10,'#000000');box(90,480,0,0,'#000000');box(90,480,570,10,'#000000');box(530,450,0,0,'#000000');box(90,440,570,10,'#000000');box(660,410,0,0,'#000000');box(90,410,570,10,'#000000');box(660,440,0,0,'#000000');lines[9.1] = [410,660,30,3,'#000000'];lines[10.1] = [450,660,30,1,'#000000'];lines[11.1] = [490,650,30,1,'#000000'];lines[12.1] = [530,660,30,1,'#000000'];lines[13.1] = [570,640,30,1,'#000000'];box(140,20,0,0,'#000000');
+				finish = [690,590,10]
+				},
+				function(){
+				lines = [[0,600,WIDTH,0,"rgb(0,0,0)"],[0,700,HEIGHT,1,"rgb(0,0,0)"],[0,30,WIDTH,2,"rgb(0,0,0)"],[0,30,HEIGHT,3,"rgb(0,0,0)"],];for (var i in players){players[i].x = 50;players[i].y = 50};lines[3.1] = [30,60,100,0,'#000000'];death.unshift([150,60,40,20]);lines[4.1] = [210,60,70,0,'#000000'];lines[5.1] = [300,30,50,0,'#000000'];death.unshift([300,30,50,40]);lines[6.1] = [60,110,270,0,'#000000'];death.unshift([300,70,30,40]);lines[7.1] = [300,70,30,0,'#000000'];death.unshift([300,60,30,40]);death.unshift([300,70,30,40]);death.unshift([330,70,20,30]);death.unshift([330,100,20,10]);death.unshift([330,100,20,10]);lines[8.1] = [330,70,20,0,'#000000'];lines[9.1] = [330,110,20,0,'#000000'];lines[10.1] = [130,60,0,0,'#000000'];box(130,60,0,20,'#000000');death.unshift([130,80,80,0]);death.unshift([210,60,0,20]);death.unshift([210,60,0,20]);lines[11.1] = [130,80,80,0,'#000000'];lines[12.1] = [210,60,0,0,'#000000'];death.unshift([210,60,10,20]);death.unshift([210,60,0,20]);box(210,60,0,20,'#000000');box(350,30,0,80,'#000000');death.unshift([30,150,40,10]);box(60,150,80,0,'#000000');box(140,150,210,0,'#000000');box(380,130,50,0,'#000000');death.unshift([360,140,20,10]);lines[13.1] = [360,140,20,0,'#000000'];death.unshift([360,150,0,0]);death.unshift([350,140,10,10]);death.unshift([350,140,10,10]);death.unshift([380,130,10,10]);lines[14.1] = [350,140,10,0,'#000000'];lines[15.1] = [380,140,10,0,'#000000'];box(350,150,90,0,'#000000');box(440,130,0,20,'#000000');death.unshift([390,140,50,10]);death.unshift([390,130,50,10]);death.unshift([360,140,30,10]);box(430,130,10,0,'#000000');box(390,140,50,0,'#000000');box(440,130,50,50,'#000000');box(440,200,80,0,'#000000');box(520,130,0,70,'#000000');death.unshift([500,190,20,10]);death.unshift([500,190,20,10]);box(350,140,30,0,'#000000');box(380,120,10,10,'#000000');box(420,120,10,10,'#000000');box(420,200,20,0,'#000000');box(400,180,20,20,'#000000');box(360,160,30,20,'#000000');box(390,180,10,0,'#000000');box(350,160,0,0,'#000000');box(70,170,290,10,'#000000');box(70,150,0,0,'#000000');box(70,180,10,90,'#000000');box(130,270,140,150,'#cce7f0');box(30,300,100,10,'#cce7f0');box(190,240,80,30,'#cce7f0');box(270,270,90,150,'#cce7f0');box(360,300,60,120,'#05850c');box(420,360,50,60,'#05850c');box(470,420,0,0,'#05850c');box(470,400,90,20,'#05850c');box(560,310,60,90,'#05850c');box(570,400,50,20,'#05850c');box(560,400,10,20,'#05850c');box(580,320,40,60,'#05850c');box(570,310,10,50,'#05850c');box(430,370,10,50,'#05850c');box(360,360,50,60,'#05850c');box(390,300,20,60,'#05850c');box(450,380,20,40,'#05850c');box(470,410,40,10,'#05850c');box(520,410,20,10,'#05850c');box(530,400,30,10,'#05850c');box(610,290,0,0,'#05850c');finish = [611,289,10];box(520,40,20,100,'#05850c');box(520,130,20,70,'#05850c');death.unshift([520,140,10,50]);death.unshift([530,40,10,160]);death.unshift([530,30,10,10]);death.unshift([520,200,20,10]);death.unshift([80,210,460,10]);death.unshift([80,210,460,10]);death.unshift([540,30,10,190]);death.unshift([30,400,120,100]);death.unshift([170,480,240,100]);death.unshift([470,530,150,50]);death.unshift([650,430,50,110]);death.unshift([650,430,50,170]);death.unshift([400,500,100,90]);death.unshift([540,520,130,70]);death.unshift([50,470,180,110]);death.unshift([130,390,50,40]);death.unshift([100,380,160,110]);death.unshift([290,440,150,80]);death.unshift([460,450,170,70]);box(120,20,0,0,'#05850c');
+				},
+				function(){
+				lines = [[0,600,WIDTH,0,"rgb(0,0,0)"],[0,700,HEIGHT,1,"rgb(0,0,0)"],[0,30,WIDTH,2,"rgb(0,0,0)"],[0,30,HEIGHT,3,"rgb(0,0,0)"],];for (var i in players){players[i].x = 50;players[i].y = 50};box(30,110,570,20,'#000000');box(620,110,80,20,'#000000');box(260,90,10,20,'#000000');box(260,30,10,20,'#000000');box(310,90,10,20,'#000000');box(310,30,10,20,'#000000');death.unshift([260,50,60,10]);death.unshift([260,80,60,10]);death.unshift([590,130,10,60]);death.unshift([620,130,10,60]);death.unshift([410,140,180,10]);death.unshift([30,140,220,30]);death.unshift([250,140,290,20]);death.unshift([540,150,50,30]);box(60,230,640,20,'#000000');box(290,190,10,40,'#000000');box(330,210,10,20,'#000000');box(370,190,20,40,'#000000');box(420,200,10,30,'#000000');box(220,210,10,20,'#000000');box(130,200,10,30,'#000000');box(470,190,10,40,'#000000');box(520,200,10,30,'#000000');box(550,210,10,20,'#000000');box(440,10,0,0,'#000000');box(30,310,630,30,'#000000');death.unshift([90,290,20,20]);death.unshift([160,250,20,40]);death.unshift([210,290,80,20]);death.unshift([210,290,110,20]);death.unshift([320,250,130,20]);death.unshift([490,270,20,40]);death.unshift([490,270,20,40]);death.unshift([550,250,20,30]);box(690,140,0,0,'#c8c8c8');buttons.unshift([691,136,function(){skins[5][2] = true},'#c8c8c8']);death.unshift([510,430,190,10]);death.unshift([30,420,300,10]);death.unshift([30,420,480,80]);death.unshift([30,500,480,100]);death.unshift([510,420,190,180]);box(640,410,60,10,'#c8c8c8');box(640,410,60,10,'#c8c8c8');box(640,410,60,10,'#000000');box(630,400,70,20,'#000000');box(630,390,0,0,'#000000');buttons.unshift([634,394,function(){for(var i =30; i < 700-60;i+=10){planets.unshift({x:i,y:415,radius:4,grav:-0.1,color:'rgb(50,0,0)'})}},'#000000']);death.unshift([30,340,630,10]);box(140,30,0,0,'#000000');box(230,80,30,30,'#000000');box(150,30,0,0,'#000000');box(230,75,30,5,'#000000');box(150,20,0,0,'#000000');box(180,80,50,30,'#000000');box(180,75,50,5,'#000000');box(115,25,0,0,'#000000');box(305,75,15,5,'#000000');box(155,25,0,0,'#000000');box(305,60,15,5,'#000000');box(130,25,0,0,'#000000');
+				finish = [40,410,10]
+				},
+				function(){
+				lines = [[0,600,WIDTH,0,"rgb(0,0,0)"],[0,700,HEIGHT,1,"rgb(0,0,0)"],[0,30,WIDTH,2,"rgb(0,0,0)"],[0,30,HEIGHT,3,"rgb(0,0,0)"],];for (var i in players){players[i].x = 50;players[i].y = 50};box(30,60,150,10,'#000000');box(220,60,130,10,'#000000');death.unshift([150,90,100,10]);death.unshift([140,90,10,10]);death.unshift([140,90,10,10]);death.unshift([250,90,10,10]);box(440,60,100,10,'#000000');death.unshift([260,90,310,10]);box(580,120,60,10,'#000000');box(0,0,0,0,'#000000');box(640,30,0,90,'#000000');death.unshift([620,150,80,10]);death.unshift([650,40,40,100]);box(560,120,10,10,'#000000');box(390,120,120,20,'#000000');box(380,130,120,0,'#000000');box(500,140,80,0,'#000000');death.unshift([500,130,10,10]);box(500,120,10,0,'#000000');box(580,130,0,10,'#000000');box(270,130,90,10,'#000000');death.unshift([130,70,10,30]);death.unshift([530,70,10,20]);death.unshift([440,70,10,20]);death.unshift([340,70,10,20]);death.unshift([220,70,10,20]);death.unshift([170,70,10,20]);box(200,130,70,0,'#000000');box(200,140,70,0,'#000000');death.unshift([200,140,0,0]);death.unshift([200,130,10,10]);death.unshift([230,130,10,10]);box(270,130,0,0,'#000000');box(270,130,0,10,'#000000');box(200,130,0,10,'#000000');box(30,130,150,10,'#000000');death.unshift([40,520,660,80]);death.unshift([30,520,10,70]);death.unshift([40,590,0,0]);death.unshift([30,590,10,10]);death.unshift([30,590,10,10]);box(40,120,0,0,'#000000');finish = [41,119,10];box(130,20,0,0,'#000000');
+				},
+				function(){
+				lines = [[0,600,WIDTH,0,"rgb(0,0,0)"],[0,700,HEIGHT,1,"rgb(0,0,0)"],[0,30,WIDTH,2,"rgb(0,0,0)"],[0,30,HEIGHT,3,"rgb(0,0,0)"],];for (var i in players){players[i].x = 50;players[i].y = 50};box(30,130,590,10,'#000000');death.unshift([110,30,590,20]);box(330,90,10,40,'#000000');death.unshift([320,90,10,40]);death.unshift([340,90,10,40]);death.unshift([30,140,590,10]);box(60,210,640,10,'#000000');death.unshift([60,200,560,10]);box(510,180,30,10,'#000000');box(350,170,40,10,'#000000');box(430,180,20,10,'#000000');box(210,190,20,10,'#000000');box(270,180,10,10,'#000000');box(310,180,10,10,'#000000');box(70,170,60,10,'#000000');death.unshift([60,180,10,20]);death.unshift([60,180,10,20]);box(30,210,10,10,'#000000');box(30,240,150,10,'#000000');death.unshift([180,240,20,10]);death.unshift([180,250,10,120]);death.unshift([200,240,20,10]);death.unshift([230,240,10,130]);death.unshift([200,360,30,10]);death.unshift([240,220,460,150]);box(230,220,10,20,'#000000');box(220,350,10,10,'#000000');box(190,250,10,10,'#000000');death.unshift([220,370,10,180]);death.unshift([260,590,440,10]);death.unshift([690,370,10,220]);box(630,410,50,10,'#000000');box(500,440,40,40,'#000000');box(340,510,70,10,'#000000');box(300,440,0,0,'#000000');box(290,440,10,10,'#000000');box(350,440,10,10,'#000000');box(470,540,10,10,'#000000');box(290,520,20,20,'#000000');box(620,530,20,20,'#000000');box(410,390,20,20,'#000000');box(430,440,10,10,'#000000');box(450,480,10,10,'#000000');box(260,390,10,10,'#000000');box(170,20,0,0,'#000000');
+				finish = [655,400,10]
+				},
+				function(){
+				lines = [[0,600,WIDTH,0,"rgb(0,0,0)"],[0,700,HEIGHT,1,"rgb(0,0,0)"],[0,30,WIDTH,2,"rgb(0,0,0)"],[0,30,HEIGHT,3,"rgb(0,0,0)"],];for (var i in players){players[i].x = 50;players[i].y = 50};death.unshift([30,130,60,40]);death.unshift([90,150,20,10]);death.unshift([90,160,30,10]);death.unshift([120,160,10,10]);death.unshift([140,160,30,10]);death.unshift([150,140,20,20]);death.unshift([150,30,20,110]);death.unshift([30,120,50,10]);box(30,170,100,10,'#000000');box(140,170,30,10,'#000000');box(170,30,10,150,'#000000');box(210,30,10,150,'#000000');box(30,200,280,10,'#000000');box(250,100,10,80,'#000000');box(250,90,60,10,'#000000');box(260,30,10,40,'#000000');box(290,30,0,0,'#000000');box(300,30,10,60,'#000000');death.unshift([220,30,40,40]);box(300,130,10,70,'#000000');box(310,130,50,10,'#000000');box(350,50,10,80,'#000000');box(360,50,120,10,'#000000');box(320,32,32,0,'#000000');box(352,32,0,0,'#000000');box(352,32,0,0,'#000000');box(0,0,0,0,'#000000');box(400,50,0,0,'#000000');box(310,30,40,10,'#000000');lines[1.1] = [30,380,20,1,'#000000'];box(190,40,0,0,'#000000');buttons.unshift([193,41,function(){delete lines[1.1]},'#000000']);lines[2.1] = [30,400,20,1,'#000000'];box(280,40,0,0,'#000000');buttons.unshift([284,41,function(){delete lines[2.1]},'#000000']);death.unshift([500,30,20,60]);death.unshift([460,60,20,30]);death.unshift([500,90,20,40]);death.unshift([490,110,10,20]);death.unshift([470,120,20,10]);death.unshift([390,120,80,10]);box(380,120,100,10,'#000000');death.unshift([460,90,0,0]);death.unshift([360,60,100,30]);box(380,130,10,30,'#000000');box(320,150,60,10,'#000000');box(310,200,30,10,'#000000');box(330,170,10,30,'#000000');box(350,160,10,40,'#000000');box(330,210,60,10,'#000000');box(370,170,10,40,'#000000');box(390,160,10,40,'#000000');box(400,140,70,10,'#000000');box(390,210,80,10,'#000000');box(420,150,10,50,'#000000');box(470,130,50,0,'#000000');box(480,130,10,90,'#000000');box(470,210,10,10,'#000000');box(0,0,0,0,'#000000');box(390,200,10,0,'#000000');lines[3.1] = [400,200,20,2,'#000000'];box(410,190,0,0,'#000000');buttons.unshift([411,187,function(){delete lines[3.1]},'#000000']);death.unshift([430,150,30,50]);box(0,0,0,0,'#000000');box(410,150,0,10,'#000000');box(0,0,0,0,'#000000');box(410,160,10,0,'#000000');lines[4.1] = [410,170,10,2,'#000000'];box(0,0,0,0,'#000000');lines[5.1] = [160,410,10,1,'#000000'];buttons.unshift([414,164,function(){delete lines[4.1];delete lines[5.1]},'#000000']);box(410,160,0,0,'#000000');box(410,190,0,0,'#000000');buttons.unshift([410,194,function(){delete lines[4.1];delete lines[5.1]},'#000000']);box(80,20,0,0,'#000000');
+				}
+				]
+				// special levels
+				levels[0.1] = function(){ // level select
+				
+					var maxlevel 
+					if(localStorage.getItem('level') != null && localStorage.getItem('level') > 0.1){maxlevel = parseInt(localStorage.getItem('level'))+1}
+					else{maxlevel = 2}
+					
+					
+					var maxHeight = Math.ceil(maxlevel*20/(WIDTH-150))*150
+					console.log(Math.ceil(maxlevel*20/(WIDTH-100)))
+                    lines = [[0,WIDTH-30,HEIGHT,1,'rgb(0,0,0)'],[0,30,WIDTH,2,'rgb(0,0,0)'],[0,30,HEIGHT,3,'rgb(0,0,0)'],];
+					box(30,100,WIDTH-190,20)
+					for (var o = 150;o<=maxHeight;o+=50){
+					lines.unshift([0,o+20,WIDTH-130,0,'rgb(0,0,0)'])
+					for (var i = 40; i<WIDTH-150 && (i<((maxlevel)%(WIDTH-100))*40);i+=40){
+					let test= parseInt(i)
+					let y = o
+					
+					buttons.unshift([i,y,function(){level = (test/40)+1+((Math.ceil(maxlevel/(WIDTH-100))*(y)/150)-2);inLevel = false;},'rgb(0,0,0)'])
+					}}
+					
+					for (var i in players){
+                        players[i].x = 50
+                        players[i].y = 50}
+				
+				}
+				levels[0.2] = function(){ // skins select
+				
+					
+					var maxskin = skins.length+1 
+					
+					var maxHeight = Math.ceil(maxskin*20/(WIDTH-150))*150
+					console.log(Math.ceil(maxskin*20/(WIDTH-100)))
+                    lines = [[0,WIDTH-30,HEIGHT,1,'rgb(0,0,0)'],[0,30,WIDTH,2,'rgb(0,0,0)'],[0,30,HEIGHT,3,'rgb(0,0,0)'],];
+					box(30,100,WIDTH-190,20)
+					for (var o = 150;o<=maxHeight;o+=50){
+					lines.unshift([0,o+20,WIDTH-130,0,'rgb(0,0,0)'])
+					for (var i = 40; i<WIDTH-150 && (i<((maxskin)%(WIDTH-100))*40);i+=40){
+					let test= parseInt(i)
+					let y = o
+					if(skins[(test/40)+1+((Math.ceil(maxskin/(WIDTH-100))*(y)/150)-2)-1][2]){
+					buttons.unshift([i,y,function(){
+					for(var i in players){
+					players[i].drawing  = skins[(test/40)+1+((Math.ceil(maxskin/(WIDTH-100))*(y)/150)-2)-1][0];
+					players[i].perks  = skins[(test/40)+1+((Math.ceil(maxskin/(WIDTH-100))*(y)/150)-2)-1][1];
+					level = 0;
+					inLevel = false;}},skins[(test/40)+1+((Math.ceil(maxskin/(WIDTH-100))*(y)/150)-2)-1][3]])}
+					}}
+					
+					for (var i in players){
+                        players[i].x = 50
+                        players[i].y = 50}
+				
+				}
+				levels[0.1337] = function(){}
+                update = function(){ // game loop
+					frames++
+                    if(!inLevel){
+						
+                    if(level > localStorage.getItem('level')){
+                    localStorage.setItem('level', level)}
+						 // updating levels
+                        inLevel = true
+						for(var i in players){
+						players[i].size = 10,
+						players[i].accRate = .1,
+						players[i].acc = 0,
+						players[i].canJump = 0,
+						players[i].canGrav = true,
+						players[i].gravAcc = 0.1,
+						players[i].jumpAcc = 3
+						players[i].maxSpeed = 5
+						
+						effects = [] // clearing everything
+						buttons = []
+						planets = []
+						text = []
+						death = []
+						players[i].perks()
+						}
+						levels[level]() 
+						frames = 0
+                    }
+                    gameCanvas.clearRect(0,0,WIDTH,HEIGHT)
+                    gameCanvas.fillStyle = 'rgb('+Math.floor(Math.random()*255)+','+Math.floor(Math.random()*255)+','+Math.floor(Math.random()*255)+')'
+                    gameCanvas.fillRect(finish[0]-finish[2]/2,finish[1]-finish[2]/2,finish[2],finish[2])		//drawing finsih
+                    gameCanvas.fillStyle = 'rgb(0,0,0)'
+                    for (var i in text){			//drawing text
+                        gameCanvas.strokeStyle = text[i][3]
+                        gameCanvas.strokeText(text[i][0],text[i][1],text[i][2])
+
+                    }
+					for(var i in death){
+					for(var o = death[i][1];o<death[i][1]+death[i][3];o+=5){
+					for(var p = death[i][0];p<death[i][0]+death[i][2];p+=5){
+					gameCanvas.fillStyle = 'rgb(255,'+(Math.floor(Math.random()*100)+50)+','+(Math.floor(Math.random()*100)+50)+')'
+					gameCanvas.fillRect(p,o,5,5)
+					}}
+					//gameCanvas.fillRect(death[i][0],death[i][1],death[i][2],death[i][3])
+					}
+                    for(var i in planets){				// drawing gravity sources
+                        gameCanvas.strokeStyle = planets[i].color
+                        gameCanvas.beginPath()
+                        gameCanvas.arc(planets[i].x,planets[i].y,planets[i].radius,0,2*Math.PI)
+                        gameCanvas.stroke()
+                        gameCanvas.closePath()
+                    }
+                    for(var i in lines){			//drawing lines
+                        gameCanvas.strokeStyle = lines[i][4]
+                        gameCanvas.beginPath()
+                        if(lines[i][3] % 2 == 0){
+                            gameCanvas.moveTo(lines[i][0],lines[i][1])
+                            gameCanvas.lineTo(lines[i][0]+lines[i][2],lines[i][1])}
+                        else{
+                            gameCanvas.moveTo(lines[i][1],lines[i][0])
+                            gameCanvas.lineTo(lines[i][1],lines[i][0]+lines[i][2])}
+                        gameCanvas.stroke()
+                    }
+                    for(var i in buttons){		// drawing buttons
+                        gameCanvas.fillStyle = buttons[i][3]
+                        gameCanvas.fillRect(buttons[i][0]-2,buttons[i][1]-2,4,4)
+                    }
+                    for (var i in players){ //player interaction
+                        if(Math.abs(players[i].vely) < players[i].maxSpeed){players[i].velx+=players[i].acc} // handling gravity and acceleration
+                        if(!players[i].canJump){players[i].canGrav = true}
+                        if(players[i].canGrav){players[i].vely+=players[i].gravAcc}
+                        players[i].x+=players[i].velx
+                        players[i].y+=players[i].vely
+                        
+                        for(var o in lines){		//Line collision
+
+
+                            if(lines[o][3] == 0 ){
+
+                                if ((players[i].y >= lines[o][1]-(players[i].size/2) && players[i].y <= lines[o][1] + 2) && (players[i].x < lines[o][0] + lines[o][2]&& players[i].x > lines[o][0])){
+                                    players[i].y =lines[o][1]-(players[i].size/2)
+                                    if(players[i].gravAcc >= 0 ){
+                                    players[i].canJump = 2}
+                                    players[i].canGrav =false
+                                    players[i].vely = 0
+                                }}
+                            else{players[i].canGrav =true}
+
+                            if(lines[o][3] == 2 ){
+                                if ((players[i].y <= lines[o][1]+(players[i].size/2) && players[i].y >= lines[o][1] - 2) && (players[i].x < lines[o][0] + lines[o][2]&& players[i].x > lines[o][0])){
+                                    players[i].y =lines[o][1]+(players[i].size/2)
+                                    players[i].vely = 0
+                                    players[i].canJump = 1
+                                }}
+
+                            if(lines[o][3] == 1 ){
+                                if ((players[i].x >= lines[o][1]-(players[i].size/2) && players[i].x <= lines[o][1] + 2) && (players[i].y < lines[o][0] + lines[o][2]&& players[i].y > lines[o][0])){
+                                    players[i].x =lines[o][1]-(players[i].size/2)
+                                    players[i].canJump = 1
+                                    players[i].velx = 0
+                                    if(players[i].vely*players[i].gravAcc < 0 ){players[i].velx = players[i].vely/3*players[i].gravAcc*10}
+                                }}
+                            if(lines[o][3] == 3 ){
+                                if ((players[i].x <= lines[o][1]+(players[i].size/2) && players[i].x >= lines[o][1] - 2) && (players[i].y < lines[o][0] + lines[o][2]&& players[i].y > lines[o][0])){
+                                    players[i].x =lines[o][1]+(players[i].size/2)
+									if(players[i].gravAcc <= 0 ){
+                                    players[i].canJump = 2}
+                                    players[i].velx = 0
+                                    if(players[i].vely*players[i].gravAcc < 0 ){players[i].velx = -players[i].vely/3*players[i].gravAcc*10}
+                                }}
+
+
+                        }
+						for(var o in planets){ 		// accelerating toards gravity sources
+                            var a = (players[i].x-planets[o].x)
+                            var b = (players[i].y-planets[o].y)
+                            var h = Math.sqrt((a*a)+(b*b))
+
+                            if(h <= planets[o].radius+players[i].size/2){
+                                players[i].velx = 0
+                                players[i].vely = 0
+                            }
+                            else if(h!=0){
+                                f= ((6.67408*planets[o].grav*200)/(h*h*10))
+
+                                players[i].velx += -a/h*f
+                                players[i].vely += -b/h*f
+                            }
+
+                        }
+					   if(players[i].x <=finish[0]+finish[2] && players[i].x >= finish[0]-finish[2]   &&   players[i].y <=finish[1]+finish[2] && players[i].y >= finish[1]-finish[2] ){
+                            level++
+                            inLevel = false  // finishing level
+
+                        }
+                        for(var o in death){
+						if(players[i].x <death[o][0]+death[o][2]+(players[i].size/2) && players[i].x > death[o][0]-(players[i].size/2)   &&   players[i].y <death[o][1]+death[o][3]+(players[i].size/2) && players[i].y > death[o][1]-(players[i].size/2)  && frames > 10){
+						inLevel = false
+						}
+						}
+						for(var o in buttons){
+                            if(players[i].x-(players[i].size/2) <= buttons[o][0]+2 && players[i].x+(players[i].size/2) >=buttons[o][0]-2  &&  players[i].y-(players[i].size/2) <= buttons[o][1]+2 && players[i].y+5 >=buttons[o][1]-2){
+                                buttons[o][2]()
+                                delete buttons[o]		//interacting with buttons
+                            }
+                        }
+                        for(var o in effects){
+                            effects[o](players[i])
+                        }
+						players[i].drawing()
+                    }
+
+                }
+
+                document.onkeydown = function(event){
+                    if(event.key == 'r'){inLevel = false} 
+                    if(event.key == 'm'){level = 0; inLevel = false;} 
+					
+					// changing acceleration to playe controls
+                    //console.log(event.key)
+                    for (var i in players){
+                        if(event.key == players[i].keybinds.up && players[i].canJump){players[i].vely = -players[i].jumpAcc;players[i].canJump--}
+                        if(event.key == players[i].keybinds.down && players[i].canJump){players[i].vely = players[i].jumpAcc;players[i].canJump--}
+                        if(event.key == players[i].keybinds.left){players[i].acc = -players[i].accRate}
+                        if(event.key == players[i].keybinds.right){players[i].acc= players[i].accRate}
+                    }
+                }
+                document.onkeyup = function(event){
+                    for (var i in players){ // decelerating when letgoing of key
+                        //if(event.key == players[i].keybinds.up){players[i].vely = 0}
+                        if(event.key == players[i].keybinds.right || players[i].keybinds.left){players[i].acc= 0}
+                    }
+                }
+				var mouse = {
+				x:0,
+				y:0,
+				}
+                document.onmousedown = function(event){
+                    console.log(event.x+','+event.y)
+                     players[0].x = event.x
+                    players[0].y = event.y
+                }
+				document.onmouseup = function(event){
+				
+				//box(mouse.x,mouse.y,event.x-mouse.x,event.y-mouse.y)
+				}
+                window.onunload = function(){
+				if(level > localStorage.getItem('level')){
+                    localStorage.setItem('level', level)}
+                
+				var tempStorage = ''
+				for(var i in skins){
+				if(skins[i][2]){
+				tempStorage += i+'|'
+				}
+				}
+				localStorage.setItem('pltSkins',tempStorage)
+				}
+                setInterval(update,1000/30)
+        </script>

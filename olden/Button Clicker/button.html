@@ -1,0 +1,224 @@
+	<head>
+	<title>Button Clicker</title>
+	<style>
+	.class {
+	  font-size: 2vw;
+	  font-style: oblique;
+	  cursor: pointer;
+	   width:20%;
+	 height:20%;
+	}
+	body {
+	  background-color: lightblue;
+	}
+	.red {
+	  color: red;
+	}
+	#bigbutton{
+	 position:relative;
+	 left:40%;
+	 top:5%;
+	 width:50%
+	}
+	#scroll{
+	position:absolute;
+	 top:5%;
+	overflow:auto;
+	height:60%;
+	width:10%
+	}
+	#ctx{
+	position:relative;
+	 top:30%;
+	
+	z-index:-100
+	}
+	</style>
+	</head>
+	<div id="bigbutton"><button onclick="meme()" class="class">Click Me!</button>
+	<br>Clicks:<span id="count">0</span></div>
+<center><canvas id="ctx" width="800px" height="300px"></canvas></center>
+	<div id="scroll">
+	<br><button onclick="upg1()" title="Bigger fingers to cick more">Bigger Fingers: <span id="fp" class="red">20</span> clicks<br><span id="fc">0</span></button>
+	<br><button onclick="upg2()" title="A program to click for you">Autoclick Program: <span id="ap" class="red">100</span> clicks<br><span id="ac">0</span></button>
+	<br><button onclick="upg3()" title="A dedicated computer for clicking">Clicker Computer: <span id="cp" class="red">1000</span> clicks<br><span id="cc">0</span></button>
+	<br><button onclick="upg4()" title='"Smart" clicking'>Clicker AI: <span id="aip" class="red">10000</span> clicks<br><span id="aic">0</span></button>
+	<br><button onclick="upg5()" title="Using nuclear fission to click">Atomic Clicker: <span id="atp" class="red">100000</span> clicks<br><span id="atc">0</span></button>	
+	<br><button onclick="upg6()" title="Breaking the laws of physics to click">Quantum Clicker: <span id="qp" class="red">1000000</span> clicks<br><span id="qc">0</span></button>
+	<br><button onclick="upg7()" title="Harnessing forbidden magic to click ">Magic clicker: <span id="mp" class="red">10000000</span> clicks<br><span id="mc">0</span></button>	
+	<br><button onclick="upg8()" title="Clicking using the souls of the dead">Soul Clicker: <span id="dp" class="red">100000000</span> clicks<br><span id="dc">0</span></button>
+	<br><button onclick="upg9()" title="sample text">ERrOR:<span id="aip" class="red">NaN</span> clicks<br><span id="aic">0</span></button>
+	<input type="checkbox" name="idks" id="sure">Autobuy</input>
+	</div>
+	<img id="pic1" src=" Finger.png"width="0">
+	<img id="pic2" src=" Cursor.png"width="0">
+	<img id="pic3" src=" Comp.png"width="0">
+	<img id="pic4" src=" Ai.png"width="0">
+	<img id="pic5" src=" Atom.png"width="0">
+	<img id="pic6" src=" Quantum.png"width="0">
+	<img id="pic7" src=" Magic.png"width="0">
+	<img id="pic8" src=" Soul.png"width="0">
+	<script>
+	var pic = {
+	p1:document.getElementById("pic1"),
+	p2:document.getElementById("pic2"),
+	p3:document.getElementById("pic3"),
+	p4:document.getElementById("pic4"),
+	p5:document.getElementById("pic5"),
+	p6:document.getElementById("pic6"),
+	p7:document.getElementById("pic7"),
+	p8:document.getElementById("pic8"),
+	}
+	var clicks = 0
+	var ctx = document.getElementById("ctx").getContext("2d");
+	var squa = 1  //unknown
+	var click2 = 0    //CPS
+	var perclick = 1 //Clicks you get per click
+	var upgrade = {
+	Finger:{
+	price:20,
+	count:0},
+	auto:{
+	price:100,
+	count:0},
+	comp:{
+	price:1000,
+	count:0},
+	ai:{
+	price:10000,
+	count:0},
+	atom:{
+	price:100000,
+	count:0},
+	qtm:{
+	price:100000,
+	count:0},
+	magic:{
+	price:1000000,
+	count:0},
+	ded:{
+	price:10000000,
+	count:0},
+	satan:{
+	price:100000000,
+	count:0},
+	}
+
+
+	upg1 = function(){
+	if(clicks >= upgrade.Finger.price){
+	ctx.drawImage(pic.p1,Math.random()*800 , Math.random()*300);
+	perclick++
+	clicks -= upgrade.Finger.price
+	upgrade.Finger.price += Math.round(upgrade.Finger.price/2)
+	upgrade.Finger.count++
+	document.getElementById("fp").innerHTML = upgrade.Finger.price
+	document.getElementById("fc").innerHTML = upgrade.Finger.count
+	document.getElementById("count").innerHTML = Math.floor(clicks)
+	}}
+	upg2 = function(){
+	if(clicks >= upgrade.auto.price){
+	ctx.drawImage(pic.p2,Math.random()*800 , Math.random()*300);
+	click2+= 1
+	clicks -= upgrade.auto.price
+	upgrade.auto.price += Math.round(upgrade.auto.price/2)
+	upgrade.auto.count++
+	document.getElementById("ap").innerHTML = upgrade.auto.price
+	document.getElementById("ac").innerHTML = upgrade.auto.count
+	document.getElementById("count").innerHTML = Math.floor(clicks)
+	}}
+	upg3 = function(){
+	if(clicks >= upgrade.comp.price){
+	ctx.drawImage(pic.p3,Math.random()*800 , Math.random()*300);
+	click2+=5
+	clicks -= upgrade.comp.price
+	upgrade.comp.price += Math.round(upgrade.comp.price/2)
+	upgrade.comp.count++
+	document.getElementById("cp").innerHTML = upgrade.comp.price
+	document.getElementById("cc").innerHTML = upgrade.comp.count
+	document.getElementById("count").innerHTML = Math.floor(clicks)
+	}}
+	upg4 = function(){
+	if(clicks >= upgrade.ai.price){
+	ctx.drawImage(pic.p4,Math.random()*800 , Math.random()*300);
+	click2+=20
+	clicks -= upgrade.ai.price
+	upgrade.ai.price += Math.round(upgrade.ai.price/2)
+	upgrade.ai.count++
+	document.getElementById("aip").innerHTML = upgrade.ai.price
+	document.getElementById("aic").innerHTML = upgrade.ai.count
+	document.getElementById("count").innerHTML = Math.floor(clicks)
+	}}
+	upg5 = function(){
+	if(clicks >= upgrade.atom.price){
+	ctx.drawImage(pic.p5,Math.random()*800 , Math.random()*300);
+	click2+=50
+	clicks -= upgrade.atom.price
+	upgrade.atom.price += Math.round(upgrade.atom.price/2)
+	upgrade.atom.count++
+	document.getElementById("atp").innerHTML = upgrade.atom.price
+	document.getElementById("atc").innerHTML = upgrade.atom.count
+	document.getElementById("count").innerHTML = Math.floor(clicks)
+	}}
+	upg6 = function(){
+	if(clicks >= upgrade.qtm.price){
+	ctx.drawImage(pic.p6,Math.random()*800 , Math.random()*300);
+	click2+=200
+	clicks -= upgrade.qtm.price
+	upgrade.qtm.price += Math.round(upgrade.qtm.price/2)
+	upgrade.qtm.count++
+	document.getElementById("qp").innerHTML = upgrade.qtm.price
+	document.getElementById("qc").innerHTML = upgrade.qtm.count
+	document.getElementById("count").innerHTML = Math.floor(clicks)
+	}}
+	upg7 = function(){
+	if(clicks >= upgrade.magic.price){
+	ctx.drawImage(pic.p7,Math.random()*800 , Math.random()*300);
+	click2+=600
+	clicks -= upgrade.magic.price
+	upgrade.magic.price += Math.round(upgrade.magic.price/2)
+	upgrade.magic.count++
+	document.getElementById("mp").innerHTML = upgrade.magic.price
+	document.getElementById("mc").innerHTML = upgrade.magic.count
+	document.getElementById("count").innerHTML = Math.floor(clicks)
+	}}
+	upg8 = function(){
+	if(clicks >= upgrade.ded.price){
+	ctx.drawImage(pic.p8,Math.random()*800 , Math.random()*300);
+	click2+=3000
+	clicks -= upgrade.ded.price
+	upgrade.ded.price += Math.round(upgrade.ded.price/2)
+	upgrade.ded.count++
+	document.getElementById("dp").innerHTML = upgrade.ded.price
+	document.getElementById("dc").innerHTML = upgrade.ded.count
+	document.getElementById("count").innerHTML = Math.floor(clicks)
+	}}
+	upg9 = function(){
+	if(clicks >= upgrade.satan.price){
+	clicks = 0
+	click2 = 0
+	squa++
+	}}
+	meme = function(){     //every time the button is clicked
+	 clicks += perclick
+	 document.getElementById("count").innerHTML = Math.floor(clicks)
+	}
+	autoclick = function(){
+	if (document.getElementById("sure").checked == true){
+	upg1()
+	upg2()
+	upg3()
+	upg4()
+	upg5()
+	upg6()
+	upg7()
+	upg8()
+	}
+
+	
+	clicks+=(click2/200)*squa
+	document.getElementById("count").innerHTML = Math.floor(clicks)
+	}
+	setInterval(autoclick,1)
+
+	</script>

@@ -1,0 +1,5 @@
+<span id="hi"><button onclick="dupe()">Click me</button></span>
+<script>
+dupe = function(){
+document.getElementById("hi").innerHTML = document.getElementById("hi").innerHTML + "<button onclick=\"dupe()\">Click me</button>"}
+</script>

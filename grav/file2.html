@@ -1,0 +1,190 @@
+<style>
+#cnvs{width:100%;height:100%;bottom:0%;left:0%;position:absolute;z-index:-100;}
+#cnvs2{width:100%;height:100%;bottom:0%;left:0%;position:absolute;z-index:-1000;}
+.noclick{z-index:100;top:0%;position:absolute;}
+#pausebutton{left:42%;width:3%;height:3%}
+#clearbutton{left:42%;width:3%;height:3%;top:3%;}
+#gravFactor{left:0%;width:20%;height:6%}
+#sizeFactor{left:21%;width:20%;height:6%}
+#massFactor{left:0%;width:20%;height:6%;top:93%}
+#transferFactor{left:21%;width:20%;height:6%;top:93%}
+#gravityLabel{left:0%;width:20%;height:3%; position:absolute;top:6%;}
+#sizeLabel{left:21%;width:10%;height:3%; position:absolute;top:6%}
+#massLabel{left:0%;width:20%;height:3%; position:absolute;bottom:7%;}
+#transferLabel{left:21%;;height:3%; position:absolute;bottom:7%;}
+#mergeButton{left:46%;}
+#traceButton{left:46%;top:3%}
+#mergeLabel{left:47.5%}
+#traceLabel{left:47.5%;top:3%}
+
+
+</style>
+<canvas width='1000' height='1000'  oncontextmenu="return false;" id='cnvs2' >hi</canvas>
+<canvas width='1000' height='1000'  oncontextmenu="return false;" id='cnvs' >hi</canvas>
+<input class = 'noclick' type="range" min="-1" max="1" step ='0.1' 	id='gravFactor' value='0.1'>
+<span id ='gravityLabel'>gravity</span>
+<input class = 'noclick' type="range" min="3" max="50" step ='0.1' id='sizeFactor' value='10'>
+<span id ='sizeLabel'>size</span>
+<input class = 'noclick' type="range" min="0.1" max="1.1" step ='.05' 	id='transferFactor' value='1'>
+<span id ='transferLabel'>Energy transfer</span>
+<input class = 'noclick' type="range" min="1" max="5" step ='.5' 	id='massFactor' value='0.1'>
+<span id ='massLabel'>mass (experimental)</span>
+<button class = 'noclick' id='pausebutton'  onclick = 'play("pausebutton")'>❚❚</button>
+<button class = 'noclick' id='clearbutton'  onclick = 'traceCanvas.clearRect(0,0,WIDTH,HEIGHT);particles = []'>clear</button>
+<input class = 'noclick' type="checkbox" id="mergeButton" name='mergeButton'><label class = 'noclick' for="mergeButton" id='mergeLabel'>Merge</label>
+<input class = 'noclick' type="checkbox" id="traceButton" name='traceButton'><label class = 'noclick' for="traceButton" id='traceLabel'>Trace</label>
+<title> </title>
+
+<script>
+
+var size = 10
+var WIDTH = Math.max(document.documentElement.clientWidth, window.innerWidth || 0)
+var HEIGHT = Math.max(document.documentElement.clientHeight, window.innerHeight || 0)
+document.getElementById('cnvs').width = WIDTH
+document.getElementById('cnvs').height = HEIGHT
+document.getElementById('cnvs2').width = WIDTH
+document.getElementById('cnvs2').height = HEIGHT
+ctx = document.getElementById('cnvs').getContext('2d')
+traceCanvas = document.getElementById('cnvs2').getContext('2d')
+ctx.fillStyle = 'rgba(255,0,200,1)'
+var particles = []
+var merge = false
+var pause = false
+newPart = function(xs,ys,gravity,xvelx,xvely){
+particles[Math.random()] = {
+y:ys,
+x:xs,
+grav:gravity,
+velx:xvelx,
+vely:xvely,
+mass:parseFloat(document.getElementById('massFactor').value),
+}
+//console.log(xvelx)
+}
+mouse = {
+x:0,
+y:0,
+nx:0,
+ny:0,
+down:false,
+}
+//❚❚
+//▶
+function play(id){
+if(pause){
+pause = false
+document.getElementById(id).innerHTML = '❚❚'} 
+else{pause = true
+document.getElementById(id).innerHTML = '▶'}}
+
+function update(){
+if(document.getElementById('mergeButton').checked){merge = true}else{merge = false}
+size = parseFloat(document.getElementById('sizeFactor').value)
+ctx.clearRect(0,0,WIDTH,HEIGHT)
+
+for(var i in particles) {
+//console.log(particles[i].x)
+//console.log(particles[i].y)
+if (!pause){
+if(particles[i].x <=0     ){particles[i].x = 0     ;particles[i].velx = -particles[i].velx}
+if(particles[i].x >=WIDTH ){particles[i].x = WIDTH ;particles[i].velx = -particles[i].velx}
+if(particles[i].y <=0     ){particles[i].y = 0     ;particles[i].vely = -particles[i].vely}
+if(particles[i].y >=HEIGHT){particles[i].y = HEIGHT;particles[i].vely = -particles[i].vely}
+particles[i].y+= particles[i].vely/particles[i].mass
+particles[i].x+= particles[i].velx/particles[i].mass}
+/*if(particles[i].velx > 0){particles[i].velx-=0.01}
+if(particles[i].velx < 0){particles[i].velx+=0.01}
+if(particles[i].vely > 0){particles[i].vely-=0.01}
+if(particles[i].vely < 0){particles[i].vely+=0.01}*/
+if(merge){
+ctx.beginPath()
+ctx.arc(particles[i].x, particles[i].y, Math.sqrt(Math.abs(particles[i].grav)/Math.PI)*50, 0, 2 * Math.PI, false);
+
+ctx.fill()
+}
+else{
+ctx.fillRect(particles[i].x-size/2,particles[i].y-size/2,size,size)}
+if(document.getElementById('traceButton').checked){
+traceCanvas.fillRect(particles[i].x-0.5,particles[i].y-0.5,1,1)
+}else{traceCanvas.clearRect(0,0,WIDTH,HEIGHT)}
+if(!pause){
+for(var o in particles){
+if(i!=o ){
+var a = (particles[i].x-particles[o].x)/10
+var b = (particles[i].y-particles[o].y)/10
+var h = Math.sqrt((a*a)+(b*b))
+if(h!=0){
+f= ((6.67408*particles[o].grav*particles[i].mass*10)/(h*h))
+
+//console.log(particles[o].mass)
+particles[i].velx += -a/h*f
+particles[i].vely += -b/h*f
+}
+
+if(merge){if((Math.abs(particles[i].y-particles[o].y) <  (Math.sqrt(Math.abs(particles[i].grav)/Math.PI)*50) && Math.abs(particles[i].x-particles[o].x) < (Math.sqrt(Math.abs(particles[i].grav)/Math.PI)*50) )){particles[o].grav += particles[i].grav
+f= (6*particles[i].grav*particles[o].mass)
+//particles[o].velx += particles[i].velx * particles[o].grav/particles[i].grav
+//particles[o].vely += particles[i].vely * particles[o].grav/particles[i].grav
+delete particles[i]
+}}else{
+if(Math.abs(particles[o].y-particles[i].y) <= size && Math.abs(particles[o].x-particles[i].x) <= size ){
+
+
+
+//console.log(momentum)
+vels = [parseFloat(particles[o].vely),parseFloat(particles[o].velx)]
+//particles[o].vely = particles[i].vely*momentum*document.getElementById('transferFactor').value;particles[i].vely  = vels[0]*nMomentum*document.getElementById('transferFactor').value
+//particles[o].velx = particles[i].velx*momentum*document.getElementById('transferFactor').value;particles[i].velx  = vels[1]*nMomentum*document.getElementById('transferFactor').value
+
+
+     if( (Math.abs(particles[o].y-particles[i].y) < size/2) && ((particles[o].x-particles[i].x) <   size) && (particles[o].x-particles[i].x) >  0){particles[i].x= particles[o].x-size;particles[o].velx = particles[i].velx*document.getElementById('transferFactor').value;particles[i].velx  = vels[1]*document.getElementById('transferFactor').value }
+	 if( (Math.abs(particles[o].y-particles[i].y) < size/2) && ((particles[o].x-particles[i].x) >  -size) && (particles[o].x-particles[i].x) <  0){particles[i].x= particles[o].x+size;particles[o].velx = particles[i].velx*document.getElementById('transferFactor').value;particles[i].velx  = vels[1]*document.getElementById('transferFactor').value }
+	 if( (Math.abs(particles[o].x-particles[i].x) < size/2) && ((particles[o].x-particles[i].y) >  -size) && (particles[o].y-particles[i].y) <  0){particles[i].y= particles[o].y+size;particles[o].vely = particles[i].vely*document.getElementById('transferFactor').value;particles[i].vely  = vels[0]*document.getElementById('transferFactor').value }
+	 if( (Math.abs(particles[o].x-particles[i].x) < size/2) && ((particles[o].x-particles[i].y) <   size) && (particles[o].y-particles[i].y) >  0){particles[i].y= particles[o].y-size;particles[o].vely = particles[i].vely*document.getElementById('transferFactor').value;particles[i].vely  = vels[0]*document.getElementById('transferFactor').value }
+}}
+
+}
+
+
+
+}}}
+if(mouse.down){
+ctx.beginPath()
+
+ctx.moveTo(mouse.x,mouse.y)
+ctx.lineTo(mouse.nx,mouse.ny)
+ctx.stroke()
+ctx.closePath()
+
+}}
+document.onmousemove = function(event){
+mouse.nx = event.x
+mouse.ny = event.y}
+
+document.onmousedown = function(event){
+//console.log(event)
+if(!( event.target.className == 'noclick')){
+mouse.x = event.clientX
+mouse.y = event.clientY
+mouse.down = true
+
+}
+
+}
+window.onresize = function(event){
+
+WIDTH = Math.max(window.innerWidth)
+HEIGHT = Math.max(window.innerHeight)
+document.getElementById('cnvs').width = WIDTH
+document.getElementById('cnvs').height = HEIGHT
+document.getElementById('cnvs2').width = WIDTH
+document.getElementById('cnvs2').height = HEIGHT
+ctx.fillStyle = 'rgba(255,0,200,1)'}
+document.onmouseup = function(event){
+
+if(!( event.target.className == 'noclick')){
+mouse.down = false
+newPart(mouse.x,mouse.y,parseFloat(document.getElementById('gravFactor').value),((event.clientX-mouse.x)/30)*parseFloat(document.getElementById('massFactor').value),((event.clientY-mouse.y)/30)*parseFloat(document.getElementById('massFactor').value))}
+} 
+setInterval(update,1000/30)
+</script>

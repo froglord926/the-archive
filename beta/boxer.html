@@ -1,0 +1,31 @@
+<style>@font-face {
+    font-family: fant;
+    src: url(fonts\unifont-10.0.07.ttf);
+}</style>
+<span id='box' style='line-height:1;letter-spacing:0; font-family: "Unifont";'>h</span>
+<script>
+var box = {
+tlCorner:['┌','┍','┎','┏','╒','╓','╔','╭'],
+flat:    ['─ ','━','┄','┅','┈','┉','╌','╍','═','╼','╾'],
+trCorner:['┐','┑','┒','┓','╕','╖','╗','╮'],
+blCorner:['└'],
+tall:    ['│'],
+brCorner:['┙'],
+mid:     ['╀'],
+}
+document.getElementById('box').innerHTML += box.tlCorner[Math.floor(Math.random()*box.tlCorner.length)]
+for(var i=0;i<=10;i++){
+document.getElementById('box').innerHTML += box.flat[Math.floor(Math.random()*box.flat.length)]
+}
+document.getElementById('box').innerHTML += box.trCorner[Math.floor(Math.random()*box.trCorner.length)]+'<br>'
+for(var i=0;i<=10;i++){
+document.getElementById('box').innerHTML += box.tall[Math.floor(Math.random()*box.tall.length)]
+for(var o=0;o<=10;o++){document.getElementById('box').innerHTML += box.mid[Math.floor(Math.random()*box.mid.length)]}
+document.getElementById('box').innerHTML += box.tall[Math.floor(Math.random()*box.tall.length)]+'<br>'
+}
+document.getElementById('box').innerHTML += box.blCorner[Math.floor(Math.random()*box.blCorner.length)]
+for(var i=0;i<=10;i++){
+document.getElementById('box').innerHTML += box.flat[Math.floor(Math.random()*box.flat.length)]
+}
+document.getElementById('box').innerHTML += box.brCorner[Math.floor(Math.random()*box.brCorner.length)]+'<br>'
+</script>

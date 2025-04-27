@@ -1,0 +1,36 @@
+<script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.5.16/p5.js"></script>
+<script>
+var Width = 1000
+var Height = 1000
+var x = 20
+var y  = 20
+var velx = 10	
+var vely  = 0
+var ball = 0
+var idk = true
+function setup() {
+createCanvas(Width, Height);}
+
+
+function draw() {
+if(!idk){
+ball--}
+if(idk){
+ball++}
+if(ball>=255){idk = false}
+if(ball<=0){idk = true}
+    fill(ball);
+strokeWeight(0);
+  ellipse(x, y, 80, 80);
+if (x > 500){velx--}
+if(x <=500){velx++}
+  x+=velx/100
+if (y > 500){vely--}
+if(y <=500){vely++}
+  y+=vely/100
+ 
+
+
+}
+
+</script>

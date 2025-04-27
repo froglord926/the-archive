@@ -1,0 +1,40 @@
+<canvas width='1000' height='500' id='cnvs' style=';bottom:0%;left:0%;'>hi</canvas>
+<script>
+ctx = document.getElementById('cnvs').getContext('2d')
+var dropping = {
+rotPoint:[1,1], 
+block:[
+[0,0,0,0],
+[1,1,0,0],
+[0,1,1,0],
+[0,0,0,0],
+],
+rotate:function(){
+var newblock =[
+[0,0,0,0],
+[1,1,0,0],
+[0,1,1,0],
+[0,0,0,0],
+]
+
+for(var i in this.block){
+for(var o in this.block[i]){
+var x = parseInt(o)-this.rotPoint[0]
+var y = parseInt(i)-this.rotPoint[1]
+console.log(x+"   "+y)
+}
+}
+},
+
+}
+update = function(){
+ctx.clearRect(0,0,100,100)
+for(i in dropping.block){
+for(o in dropping.block[i]){
+if( dropping.block[i][o] == 1){
+ctx.fillRect(o*10,i*10,10,10)}
+
+
+}}}
+setInterval(update,30)
+</script>

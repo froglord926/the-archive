@@ -1,0 +1,29 @@
+<h1>Friut Store</h1>
+<h2>We got apples and oranges</h2>
+<button onclick="buy()">Order</button>
+<div id="hi"></div>
+<script>
+function buy(){
+var apples = prompt("How many apples")
+var oranges = prompt("How many oranges")
+document.getElementById("hi").innerHTML = "Apples:"+apples+" Oranges:"+oranges +"<br>"
+if(!isNaN(apples)){
+if(apples <=500){
+while(apples){
+apples--
+document.getElementById("hi").innerHTML += "<img src='https://www.apple.com/news/images/og.png?201703271054' width='20'>"
+}}else{alert("Too many apples")}
+}else{alert("Not a valid apple number")}
+
+if(!isNaN(oranges)){
+if(oranges <=500){
+while(oranges){
+oranges--
+document.getElementById("hi").innerHTML += "<img src='https://d3nevzfk7ii3be.cloudfront.net/igi/KRLMkuaBjm5mKDDP' width='20'>"
+}}else{alert("Too many oranges")}
+}else{alert("Not a valid orange number")}
+
+}
+
+
+</script>

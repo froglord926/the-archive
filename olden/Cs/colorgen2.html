@@ -1,0 +1,68 @@
+<head><title id="title"></title></head>
+<style>
+#ctx{
+	position:absolute;
+	top:0%;
+	right:0%;
+	height:100%;
+	width:100%;
+	cursor:none;
+	image-rendering: pixelated;
+	}
+</style>
+<canvas id="ctx" width="1000" height="1000"></canvas>
+<script>
+var width = prompt("width")
+var height = prompt("height")
+var repeat = confirm("repeat")
+document.getElementById('ctx').height = height
+document.getElementById('ctx').width = width
+var ctx= document.getElementById('ctx').getContext('2d')
+var x=0
+var y=0
+var pix =1
+function update(){
+	if(x>=width){
+	y+=pix
+	x=0
+	}
+	if(!(y>=height)){
+	
+	while(x<=width){
+	var color={
+	h:Math.round(Math.random()*255),
+	s:Math.round(Math.random()*255),
+	l:Math.round(Math.random()*255),
+	}
+	//window.document.title="rgb("+color.h+","+color.s+"%,"+color.l+"%)"
+	ctx.fillStyle= "rgb("+color.h+","+color.s+","+color.l+")"
+	ctx.fillRect(x,y,pix,pix)
+	x+=pix}
+	}else if(repeat){y=0}
+	//ctx.fillStyle= "hsla("+Math.random()*360+","+Math.random()*100+"%,"+Math.random()*100+"%,"+Math.random()+")"
+	//ctx.fillRect(Math.random()*height,Math.random()*width,Math.random()*50,Math.random()*50)
+}
+	setInterval(update,10)
+	setInterval(update,10)
+	setInterval(update,10)
+	setInterval(update,10)
+	setInterval(update,10)
+	setInterval(update,10)
+	setInterval(update,10)
+	setInterval(update,10)
+	setInterval(update,10)
+	setInterval(update,10)
+	setInterval(update,10)
+	setInterval(update,10)
+	setInterval(update,10)
+	setInterval(update,10)
+	setInterval(update,10)
+	setInterval(update,10)
+	setInterval(update,10)
+	setInterval(update,10)
+	setInterval(update,10)
+	setInterval(update,10)
+	setInterval(update,10)
+	setInterval(update,10)
+	setInterval(update,10)
+</script>
